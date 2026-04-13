@@ -1,0 +1,11 @@
+[
+  {
+    "id": 1,
+    "title": "Grace in every detail.",
+    "subtitle": "Luxury Fashion & Home Collection",
+    "description": "Discover premium clothes, elegant bed sheets, soft towels, and beautifully curated accessories crafted for timeless style.",
+    "image": "assets/banner.jpg",
+    "buttonText": "Shop Now",
+    "buttonLink": "products.html"
+  }
+]

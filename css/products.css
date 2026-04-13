@@ -1,0 +1,254 @@
+/* Products Page Styling - Aura Ceylon */
+
+.products-page {
+  padding-top: 40px;
+}
+
+/* Hero */
+.shop-hero {
+  padding: 60px 0 30px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+
+.shop-hero h1 {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(32px, 5vw, 52px);
+  margin: 12px 0;
+}
+
+.shop-subtext {
+  color: var(--text-soft);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Layout */
+.shop-section {
+  padding: 40px 0 80px;
+}
+
+.shop-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 30px;
+}
+
+/* Sidebar Filters */
+.filters-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.filter-box {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 18px;
+}
+
+.filter-box h3 {
+  font-family: "Playfair Display", serif;
+  margin-bottom: 12px;
+  color: var(--gold-soft);
+}
+
+.filter-input,
+.filter-select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #0a0a0a;
+  color: var(--text);
+}
+
+.filter-input:focus,
+.filter-select:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+
+/* Filter buttons */
+.filter-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-btn {
+  padding: 10px;
+  border-radius: 8px;
+  text-align: left;
+  border: 1px solid transparent;
+  color: var(--text-soft);
+  background: transparent;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.filter-btn:hover {
+  background: rgba(212, 175, 55, 0.08);
+  color: var(--gold-soft);
+}
+
+.filter-btn.active {
+  border-color: var(--gold);
+  color: var(--gold-soft);
+  background: rgba(212, 175, 55, 0.1);
+}
+
+/* Products area */
+.products-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.products-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-soft);
+}
+
+/* Grid */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+/* Product Card (inherits base styles, just tweaks) */
+.product-card {
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-6px);
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+}
+
+.empty-state h3 {
+  font-family: "Playfair Display", serif;
+  margin-bottom: 10px;
+}
+
+.empty-state p {
+  color: var(--text-soft);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .shop-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .filters-panel {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .filter-box {
+    flex: 1 1 200px;
+  }
+
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .shop-hero {
+    padding: 40px 0 20px;
+  }
+}
+
+.product-details-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+.product-details-image-box,
+.product-details-info {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  box-shadow: var(--shadow);
+}
+
+.product-details-image-wrap {
+  min-height: 460px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: linear-gradient(180deg, #111111, #090909);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-details-info h2 {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(28px, 4vw, 42px);
+  margin: 10px 0 14px;
+}
+
+.product-description {
+  color: var(--text-soft);
+  margin-bottom: 24px;
+  line-height: 1.8;
+}
+
+.product-details-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: end;
+}
+
+.quantity-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 100px;
+}
+
+.quantity-box label {
+  color: var(--gold-soft);
+  font-size: 14px;
+}
+
+.quantity-box input {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #0a0a0a;
+  color: var(--text);
+}
+
+@media (max-width: 860px) {
+  .product-details-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .product-details-image-wrap {
+    min-height: 320px;
+  }
+}

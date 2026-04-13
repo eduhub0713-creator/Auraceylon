@@ -1,0 +1,74 @@
+[
+  {
+    "id": 1,
+    "name": "Luxury Printed Bed Sheet",
+    "category": "Bed Sheets",
+    "price": 6500,
+    "image": "assets/products/bedsheet-1.jpg",
+    "featured": true,
+    "description": "Premium quality bed sheet with elegant patterns and soft fabric for ultimate comfort."
+  },
+  {
+    "id": 2,
+    "name": "Soft Cotton Towel Set",
+    "category": "Towels",
+    "price": 3200,
+    "image": "assets/products/towel-1.jpg",
+    "featured": true,
+    "description": "Highly absorbent and soft cotton towel set designed for everyday luxury."
+  },
+  {
+    "id": 3,
+    "name": "Elegant Women Dress",
+    "category": "Clothes",
+    "price": 5400,
+    "image": "assets/products/dress-1.jpg",
+    "featured": true,
+    "description": "Stylish and elegant women's dress perfect for both casual and special occasions."
+  },
+  {
+    "id": 4,
+    "name": "Classic Bed Sheet Set",
+    "category": "Bed Sheets",
+    "price": 7200,
+    "image": "assets/products/bedsheet-2.jpg",
+    "featured": false,
+    "description": "A refined bed sheet set with a smooth finish and durable stitching."
+  },
+  {
+    "id": 5,
+    "name": "Premium Bath Towel",
+    "category": "Towels",
+    "price": 1800,
+    "image": "assets/products/towel-2.jpg",
+    "featured": false,
+    "description": "Soft and durable towel made from high-quality cotton for daily use."
+  },
+  {
+    "id": 6,
+    "name": "Girls Hair Accessories Set",
+    "category": "Girls Accessories",
+    "price": 1200,
+    "image": "assets/products/accessory-1.jpg",
+    "featured": true,
+    "description": "Beautiful and colorful hair accessories set for girls with premium finish."
+  },
+  {
+    "id": 7,
+    "name": "Luxury Evening Dress",
+    "category": "Clothes",
+    "price": 8500,
+    "image": "assets/products/dress-2.jpg",
+    "featured": false,
+    "description": "Elegant evening dress designed with a premium touch for special occasions."
+  },
+  {
+    "id": 8,
+    "name": "Decorative Cushion Cover",
+    "category": "Bed Sheets",
+    "price": 900,
+    "image": "assets/products/bedsheet-3.jpg",
+    "featured": false,
+    "description": "Stylish cushion cover to enhance the elegance of your home decor."
+  }
+]

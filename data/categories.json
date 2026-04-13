@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Clothes",
+    "image": "assets/products/dress-1.jpg",
+    "link": "products.html?category=Clothes"
+  },
+  {
+    "name": "Bed Sheets",
+    "image": "assets/products/bedsheet-1.jpg",
+    "link": "products.html?category=Bed%20Sheets"
+  },
+  {
+    "name": "Towels",
+    "image": "assets/products/towel-1.jpg",
+    "link": "products.html?category=Towels"
+  },
+  {
+    "name": "Girls Accessories",
+    "image": "assets/products/accessory-1.jpg",
+    "link": "products.html?category=Girls%20Accessories"
+  }
+]
