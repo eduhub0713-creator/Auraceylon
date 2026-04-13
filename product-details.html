@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Product Details | Aura Ceylon</title>
+  <meta
+    name="description"
+    content="View product details, pricing, and add luxury Aura Ceylon items to your cart."
+  />
+  <meta name="theme-color" content="#000000" />
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="assets/icon-192.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/products.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <a href="index.html" class="brand">
+        <img src="assets/logo.jpg" alt="Aura Ceylon Logo" class="brand-logo" />
+        <div class="brand-text">
+          <span class="brand-name">AURA CEYLON</span>
+          <span class="brand-tagline">Elegant • Timeless • Premium</span>
+        </div>
+      </a>
+
+      <button class="menu-toggle" id="menuToggle" aria-label="Open menu">
+        ☰
+      </button>
+
+      <nav class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="products.html" class="active">Shop</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="cart.html" class="cart-link">Cart <span id="cartCount">0</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="products-page">
+    <section class="shop-hero">
+      <div class="container">
+        <p class="section-label">Aura Ceylon Collection</p>
+        <h1>Product Details</h1>
+        <p class="shop-subtext">
+          Premium product view designed in the same luxury black and gold Aura Ceylon style.
+        </p>
+      </div>
+    </section>
+
+    <section class="shop-section">
+      <div class="container">
+        <div id="productDetailsContainer" class="product-details-layout">
+          <div class="product-details-image-box">
+            <div class="product-details-image-wrap">
+              <div class="product-placeholder">Loading Product...</div>
+            </div>
+          </div>
+
+          <div class="product-details-info">
+            <p class="product-category">Category</p>
+            <h2>Product Name</h2>
+            <p class="product-price">LKR 0</p>
+            <p class="product-description">
+              Product description will appear here.
+            </p>
+
+            <div class="product-details-actions">
+              <div class="quantity-box">
+                <label for="quantityInput">Qty</label>
+                <input type="number" id="quantityInput" min="1" value="1" />
+              </div>
+
+              <button class="btn btn-gold" id="addToCartBtn">Add to Cart</button>
+              <a href="products.html" class="btn btn-outline">Back to Shop</a>
+            </div>
+          </div>
+        </div>
+
+        <div id="productNotFound" class="empty-state" hidden>
+          <h3>Product not found</h3>
+          <p>The product you are looking for does not exist or was removed.</p>
+          <a href="products.html" class="btn btn-gold">Return to Shop</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <div class="footer-brand">
+          <img src="assets/logo.jpg" alt="Aura Ceylon Logo" />
+          <div>
+            <h3>Aura Ceylon</h3>
+            <p>Elegant • Timeless • Premium</p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="products.html">Shop</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>Categories</h4>
+        <ul>
+          <li><a href="products.html?category=Clothes">Clothes</a></li>
+          <li><a href="products.html?category=Bed%20Sheets">Bed Sheets</a></li>
+          <li><a href="products.html?category=Towels">Towels</a></li>
+          <li><a href="products.html?category=Girls%20Accessories">Girls Accessories</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>Contact</h4>
+        <ul>
+          <li>Email: info@auraceylon.com</li>
+          <li>Phone: +94 77 123 4567</li>
+          <li>Sri Lanka</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="container footer-bottom">
+      <p>© 2026 Aura Ceylon. All rights reserved.</p>
+      <div class="footer-legal-links">
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="terms.html">Terms &amp; Conditions</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/pwa.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/products.js"></script>
+
+  <script>
+    const CART_KEY = "auraceylon-cart";
+
+    function getProductIdFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      return Number(params.get("id"));
+    }
+
+    function getCartItems() {
+      const cart = localStorage.getItem(CART_KEY);
+      return cart ? JSON.parse(cart) : [];
+    }
+
+    function saveCartItems(cart) {
+      localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    }
+
+    function updateCartCountOnPage() {
+      const cartCountEl = document.getElementById("cartCount");
+      if (!cartCountEl) return;
+
+      const cart = getCartItems();
+      const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+      cartCountEl.textContent = totalItems;
+    }
+
+    function formatPrice(price) {
+      return `LKR ${Number(price).toLocaleString()}`;
+    }
+
+    function addToCart(product, quantity) {
+      const cart = getCartItems();
+      const existingItem = cart.find(item => item.id === product.id);
+
+      if (existingItem) {
+        existingItem.quantity += quantity;
+      } else {
+        cart.push({
+          id: product.id,
+          name: product.name,
+          category: product.category,
+          price: product.price,
+          image: product.image,
+          quantity: quantity
+        });
+      }
+
+      saveCartItems(cart);
+      updateCartCountOnPage();
+      showToast(`${product.name} added to cart.`);
+    }
+
+    function renderProduct(product) {
+      const container = document.getElementById("productDetailsContainer");
+      if (!container) return;
+
+      container.innerHTML = `
+        <div class="product-details-image-box">
+          <div class="product-details-image-wrap">
+            ${
+              product.image
+                ? `<img src="${product.image}" alt="${product.name}" class="product-image" />`
+                : `<div class="product-placeholder">Product Image</div>`
+            }
+          </div>
+        </div>
+
+        <div class="product-details-info">
+          <p class="product-category">${product.category}</p>
+          <h2>${product.name}</h2>
+          <p class="product-price">${formatPrice(product.price)}</p>
+          <p class="product-description">${product.description || "No description available."}</p>
+
+          <div class="product-details-actions">
+            <div class="quantity-box">
+              <label for="quantityInput">Qty</label>
+              <input type="number" id="quantityInput" min="1" value="1" />
+            </div>
+
+            <button class="btn btn-gold" id="addToCartBtn">Add to Cart</button>
+            <a href="products.html" class="btn btn-outline">Back to Shop</a>
+          </div>
+        </div>
+      `;
+
+      const addToCartBtn = document.getElementById("addToCartBtn");
+      const quantityInput = document.getElementById("quantityInput");
+
+      if (addToCartBtn && quantityInput) {
+        addToCartBtn.addEventListener("click", () => {
+          const quantity = Math.max(1, Number(quantityInput.value) || 1);
+          addToCart(product, quantity);
+        });
+      }
+    }
+
+    async function loadProductDetails() {
+      updateCartCountOnPage();
+
+      const productId = getProductIdFromURL();
+      const notFoundBox = document.getElementById("productNotFound");
+      const detailsBox = document.getElementById("productDetailsContainer");
+
+      try {
+        const response = await fetch("./data/products.json");
+        const products = await response.json();
+
+        const product = products.find(item => item.id === productId);
+
+        if (!product) {
+          if (detailsBox) detailsBox.hidden = true;
+          if (notFoundBox) notFoundBox.hidden = false;
+          return;
+        }
+
+        renderProduct(product);
+      } catch (error) {
+        console.error("Failed to load product details:", error);
+        if (detailsBox) detailsBox.hidden = true;
+        if (notFoundBox) notFoundBox.hidden = false;
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", loadProductDetails);
+  </script>
+</body>
+</html>

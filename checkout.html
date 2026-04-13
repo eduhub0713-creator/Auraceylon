@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Checkout | Aura Ceylon</title>
+  <meta
+    name="description"
+    content="Complete your Aura Ceylon order with delivery and payment details."
+  />
+  <meta name="theme-color" content="#000000" />
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="assets/icon-192.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/cart.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <a href="index.html" class="brand">
+        <img src="assets/logo.jpg" alt="Aura Ceylon Logo" class="brand-logo" />
+        <div class="brand-text">
+          <span class="brand-name">AURA CEYLON</span>
+          <span class="brand-tagline">Elegant • Timeless • Premium</span>
+        </div>
+      </a>
+
+      <button class="menu-toggle" id="menuToggle" aria-label="Open menu">
+        ☰
+      </button>
+
+      <nav class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="products.html">Shop</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="cart.html" class="cart-link">Cart <span id="cartCount">0</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="cart-page">
+    <section class="cart-hero">
+      <div class="container">
+        <p class="section-label">Aura Ceylon</p>
+        <h1>Checkout</h1>
+        <p class="cart-subtext">
+          Enter your details and confirm your order.
+        </p>
+      </div>
+    </section>
+
+    <section class="cart-section">
+      <div class="container cart-layout">
+        <div class="cart-items-panel">
+          <div class="panel-head">
+            <h2>Customer Details</h2>
+          </div>
+
+          <form id="checkoutForm" class="checkout-form">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="fullName">Full Name</label>
+                <input type="text" id="fullName" name="fullName" placeholder="Your full name" required />
+              </div>
+
+              <div class="form-group">
+                <label for="phoneNumber">Phone Number</label>
+                <input type="tel" id="phoneNumber" name="phoneNumber" placeholder="07X XXX XXXX" required />
+              </div>
+
+              <div class="form-group full-width">
+                <label for="emailAddress">Email Address</label>
+                <input type="email" id="emailAddress" name="emailAddress" placeholder="you@example.com" />
+              </div>
+
+              <div class="form-group full-width">
+                <label for="addressLine">Delivery Address</label>
+                <textarea id="addressLine" name="addressLine" rows="4" placeholder="House number, street, city" required></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="city">City</label>
+                <input type="text" id="city" name="city" placeholder="City" required />
+              </div>
+
+              <div class="form-group">
+                <label for="paymentMethod">Payment Method</label>
+                <select id="paymentMethod" name="paymentMethod" required>
+                  <option value="">Select payment method</option>
+                  <option value="cash-on-delivery">Cash on Delivery</option>
+                  <option value="bank-transfer">Bank Transfer</option>
+                </select>
+              </div>
+
+              <div class="form-group full-width">
+                <label for="orderNotes">Order Notes</label>
+                <textarea id="orderNotes" name="orderNotes" rows="3" placeholder="Optional note about your order"></textarea>
+              </div>
+            </div>
+
+            <div class="summary-actions">
+              <button type="submit" class="btn btn-gold">Place Order</button>
+              <a href="cart.html" class="btn btn-outline">Back to Cart</a>
+            </div>
+          </form>
+
+          <div id="checkoutSuccess" class="empty-state" hidden>
+            <h3>Order placed successfully</h3>
+            <p>Thank you for shopping with Aura Ceylon.</p>
+            <a href="index.html" class="btn btn-gold">Go to Home</a>
+          </div>
+        </div>
+
+        <aside class="cart-summary-panel">
+          <div class="panel-head">
+            <h2>Order Summary</h2>
+          </div>
+
+          <div id="checkoutItemsContainer" class="cart-items-list">
+            <!-- JS renders checkout items -->
+          </div>
+
+          <div class="summary-list">
+            <div class="summary-row">
+              <span>Items</span>
+              <strong id="summaryItems">0</strong>
+            </div>
+            <div class="summary-row">
+              <span>Subtotal</span>
+              <strong id="summarySubtotal">LKR 0</strong>
+            </div>
+            <div class="summary-row">
+              <span>Delivery</span>
+              <strong id="summaryDelivery">LKR 0</strong>
+            </div>
+            <div class="summary-row total-row">
+              <span>Total</span>
+              <strong id="summaryTotal">LKR 0</strong>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <div class="footer-brand">
+          <img src="assets/logo.jpg" alt="Aura Ceylon Logo" />
+          <div>
+            <h3>Aura Ceylon</h3>
+            <p>Elegant • Timeless • Premium</p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="products.html">Shop</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>Categories</h4>
+        <ul>
+          <li><a href="products.html?category=Clothes">Clothes</a></li>
+          <li><a href="products.html?category=Bed%20Sheets">Bed Sheets</a></li>
+          <li><a href="products.html?category=Towels">Towels</a></li>
+          <li><a href="products.html?category=Girls%20Accessories">Girls Accessories</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>Contact</h4>
+        <ul>
+          <li>Email: info@auraceylon.com</li>
+          <li>Phone: +94 77 123 4567</li>
+          <li>Sri Lanka</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="container footer-bottom">
+      <p>© 2026 Aura Ceylon. All rights reserved.</p>
+      <div class="footer-legal-links">
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="terms.html">Terms &amp; Conditions</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/pwa.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/checkout.js"></script>
+
+  <script>
+    const menuToggle = document.getElementById("menuToggle");
+    const navLinks = document.getElementById("navLinks");
+
+    if (menuToggle && navLinks) {
+      menuToggle.addEventListener("click", () => {
+        navLinks.classList.toggle("show");
+      });
+    }
+  </script>
+</body>
+</html>

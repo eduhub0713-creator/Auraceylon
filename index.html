@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Aura Ceylon | Luxury Fashion & Home</title>
+  <meta
+    name="description"
+    content="Aura Ceylon offers elegant clothes, premium bed sheets, soft towels, and beautiful accessories in a luxury black and gold shopping experience."
+  />
+  <meta name="theme-color" content="#000000" />
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="assets/icon-192.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name="apple-mobile-web-app-title" content="Aura Ceylon" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/home.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <a href="index.html" class="brand">
+        <img src="assets/logo.jpg" alt="Aura Ceylon Logo" class="brand-logo" />
+        <div class="brand-text">
+          <span class="brand-name">AURA CEYLON</span>
+          <span class="brand-tagline">Elegant • Timeless • Premium</span>
+        </div>
+      </a>
+
+      <button class="menu-toggle" id="menuToggle" aria-label="Open menu">
+        ☰
+      </button>
+
+      <nav class="nav-links" id="navLinks">
+        <a href="index.html" class="active">Home</a>
+        <a href="products.html">Shop</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="cart.html" class="cart-link">Cart <span id="cartCount">0</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-overlay"></div>
+      <img src="assets/banner.jpg" alt="Aura Ceylon Banner" class="hero-banner" />
+
+      <div class="container hero-content">
+        <div class="hero-copy">
+          <p class="eyebrow">Luxury Fashion & Home Collection</p>
+          <h1>Grace in every detail.</h1>
+          <p class="hero-text">
+            Discover premium clothes, elegant bed sheets, soft towels, and
+            beautifully curated accessories crafted for timeless style.
+          </p>
+
+          <div class="hero-actions">
+            <a href="products.html" class="btn btn-gold">Shop Now</a>
+            <a href="about.html" class="btn btn-outline">Our Story</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Categories -->
+    <section class="section section-dark">
+      <div class="container">
+        <div class="section-head">
+          <p class="section-label">Our Collections</p>
+          <h2>Shop by Category</h2>
+          <p class="section-subtext">
+            A refined collection inspired by the elegance of your brand identity.
+          </p>
+        </div>
+
+        <div class="category-grid">
+          <a href="products.html?category=Clothes" class="category-card">
+            <div class="category-icon">✦</div>
+            <h3>Clothes</h3>
+            <p>Elegant styles for everyday and occasion wear.</p>
+          </a>
+
+          <a href="products.html?category=Bed%20Sheets" class="category-card">
+            <div class="category-icon">✦</div>
+            <h3>Bed Sheets</h3>
+            <p>Premium comfort with luxury texture and finish.</p>
+          </a>
+
+          <a href="products.html?category=Towels" class="category-card">
+            <div class="category-icon">✦</div>
+            <h3>Towels</h3>
+            <p>Soft, refined essentials made for daily comfort.</p>
+          </a>
+
+          <a href="products.html?category=Girls%20Accessories" class="category-card">
+            <div class="category-icon">✦</div>
+            <h3>Girls Accessories</h3>
+            <p>Beautiful finishing touches with a graceful feel.</p>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Products -->
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <p class="section-label">Featured</p>
+          <h2>Signature Picks</h2>
+          <p class="section-subtext">
+            A premium showcase styled to match the luxury gold-and-black Aura Ceylon look.
+          </p>
+        </div>
+
+        <div class="product-grid" id="featuredProducts">
+          <!-- JS can fill products later -->
+          <article class="product-card">
+            <div class="product-image-wrap">
+              <div class="product-placeholder">Product Image</div>
+            </div>
+            <div class="product-info">
+              <p class="product-category">Bed Sheets</p>
+              <h3>Luxury Printed Bed Sheet</h3>
+              <p class="product-price">LKR 6,500</p>
+              <a href="product-details.html" class="btn btn-small">View Product</a>
+            </div>
+          </article>
+
+          <article class="product-card">
+            <div class="product-image-wrap">
+              <div class="product-placeholder">Product Image</div>
+            </div>
+            <div class="product-info">
+              <p class="product-category">Towels</p>
+              <h3>Soft Cotton Towel Set</h3>
+              <p class="product-price">LKR 3,200</p>
+              <a href="product-details.html" class="btn btn-small">View Product</a>
+            </div>
+          </article>
+
+          <article class="product-card">
+            <div class="product-image-wrap">
+              <div class="product-placeholder">Product Image</div>
+            </div>
+            <div class="product-info">
+              <p class="product-category">Clothes</p>
+              <h3>Elegant Women Dress</h3>
+              <p class="product-price">LKR 5,400</p>
+              <a href="product-details.html" class="btn btn-small">View Product</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Brand Story -->
+    <section class="section section-dark brand-story">
+      <div class="container story-grid">
+        <div class="story-image-card">
+          <img src="assets/logo.jpg" alt="Aura Ceylon Brand" />
+        </div>
+
+        <div class="story-copy">
+          <p class="section-label">The Aura Ceylon Identity</p>
+          <h2>Luxury rooted in simplicity.</h2>
+          <p>
+            Your logo already gives a strong premium direction: deep black,
+            warm gold, and elegant symmetry. This homepage follows that same
+            feeling with refined spacing, rich contrast, and timeless typography.
+          </p>
+          <p>
+            The goal is not a colorful marketplace look. It is a polished,
+            premium store that feels exclusive and memorable.
+          </p>
+          <a href="about.html" class="btn btn-gold">Read More</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="section">
+      <div class="container">
+        <div class="cta-box">
+          <p class="section-label">Start Shopping</p>
+          <h2>Experience Aura Ceylon.</h2>
+          <p>
+            Explore fashion, home essentials, and elegant accessories in one
+            luxurious shopping space.
+          </p>
+          <a href="products.html" class="btn btn-gold">Browse Collection</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <div class="footer-brand">
+          <img src="assets/logo.jpg" alt="Aura Ceylon Logo" />
+          <div>
+            <h3>Aura Ceylon</h3>
+            <p>Elegant • Timeless • Premium</p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="products.html">Shop</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>Categories</h4>
+        <ul>
+          <li><a href="products.html?category=Clothes">Clothes</a></li>
+          <li><a href="products.html?category=Bed%20Sheets">Bed Sheets</a></li>
+          <li><a href="products.html?category=Towels">Towels</a></li>
+          <li><a href="products.html?category=Girls%20Accessories">Girls Accessories</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>Contact</h4>
+        <ul>
+          <li>Email: info@auraceylon.com</li>
+          <li>Phone: +94 77 123 4567</li>
+          <li>Sri Lanka</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="container footer-bottom">
+      <p>© 2026 Aura Ceylon. All rights reserved.</p>
+      <div class="footer-legal-links">
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="terms.html">Terms &amp; Conditions</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/pwa.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/main.js"></script>
+
+  <script>
+    const menuToggle = document.getElementById("menuToggle");
+    const navLinks = document.getElementById("navLinks");
+
+    if (menuToggle && navLinks) {
+      menuToggle.addEventListener("click", () => {
+        navLinks.classList.toggle("show");
+      });
+    }
+  </script>
+</body>
+</html>

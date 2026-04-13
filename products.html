@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Shop | Aura Ceylon</title>
+  <meta
+    name="description"
+    content="Browse Aura Ceylon products including clothes, bed sheets, towels, and girls accessories."
+  />
+  <meta name="theme-color" content="#000000" />
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="assets/icon-192.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/products.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <a href="index.html" class="brand">
+        <img src="assets/logo.jpg" alt="Aura Ceylon Logo" class="brand-logo" />
+        <div class="brand-text">
+          <span class="brand-name">AURA CEYLON</span>
+          <span class="brand-tagline">Elegant • Timeless • Premium</span>
+        </div>
+      </a>
+
+      <button class="menu-toggle" id="menuToggle" aria-label="Open menu">
+        ☰
+      </button>
+
+      <nav class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="products.html" class="active">Shop</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="cart.html" class="cart-link">Cart <span id="cartCount">0</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="products-page">
+    <section class="shop-hero">
+      <div class="container">
+        <p class="section-label">Aura Ceylon Collection</p>
+        <h1>Shop Our Products</h1>
+        <p class="shop-subtext">
+          Browse elegant clothes, luxury bed sheets, soft towels, and beautiful accessories.
+        </p>
+      </div>
+    </section>
+
+    <section class="shop-section">
+      <div class="container shop-layout">
+        <aside class="filters-panel">
+          <div class="filter-box">
+            <h3>Search</h3>
+            <input
+              type="text"
+              id="searchInput"
+              class="filter-input"
+              placeholder="Search products..."
+            />
+          </div>
+
+          <div class="filter-box">
+            <h3>Category</h3>
+            <div class="filter-list">
+              <button class="filter-btn active" data-category="All">All</button>
+              <button class="filter-btn" data-category="Clothes">Clothes</button>
+              <button class="filter-btn" data-category="Bed Sheets">Bed Sheets</button>
+              <button class="filter-btn" data-category="Towels">Towels</button>
+              <button class="filter-btn" data-category="Girls Accessories">Girls Accessories</button>
+            </div>
+          </div>
+
+          <div class="filter-box">
+            <h3>Sort By</h3>
+            <select id="sortSelect" class="filter-select">
+              <option value="default">Default</option>
+              <option value="low-high">Price: Low to High</option>
+              <option value="high-low">Price: High to Low</option>
+              <option value="name-az">Name: A to Z</option>
+              <option value="name-za">Name: Z to A</option>
+            </select>
+          </div>
+        </aside>
+
+        <div class="products-content">
+          <div class="products-toolbar">
+            <p id="resultsCount">Showing products</p>
+          </div>
+
+          <div class="products-grid" id="productsGrid">
+            <!-- JS renders products here -->
+          </div>
+
+          <div class="empty-state" id="emptyState" hidden>
+            <h3>No products found</h3>
+            <p>Try changing your search or category filter.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <div class="footer-brand">
+          <img src="assets/logo.jpg" alt="Aura Ceylon Logo" />
+          <div>
+            <h3>Aura Ceylon</h3>
+            <p>Elegant • Timeless • Premium</p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="products.html">Shop</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>Categories</h4>
+        <ul>
+          <li><a href="products.html?category=Clothes">Clothes</a></li>
+          <li><a href="products.html?category=Bed%20Sheets">Bed Sheets</a></li>
+          <li><a href="products.html?category=Towels">Towels</a></li>
+          <li><a href="products.html?category=Girls%20Accessories">Girls Accessories</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>Contact</h4>
+        <ul>
+          <li>Email: info@auraceylon.com</li>
+          <li>Phone: +94 77 123 4567</li>
+          <li>Sri Lanka</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="container footer-bottom">
+      <p>© 2026 Aura Ceylon. All rights reserved.</p>
+      <div class="footer-legal-links">
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="terms.html">Terms &amp; Conditions</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/pwa.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/products.js"></script>
+
+  <script>
+    const menuToggle = document.getElementById("menuToggle");
+    const navLinks = document.getElementById("navLinks");
+
+    if (menuToggle && navLinks) {
+      menuToggle.addEventListener("click", () => {
+        navLinks.classList.toggle("show");
+      });
+    }
+  </script>
+</body>
+</html>
