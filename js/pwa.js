@@ -1,44 +1,34 @@
-// Register Service Worker (required for PWA)
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker
-      .register("service-worker.js")
-      .then((registration) => {
-        console.log("Service Worker registered:", registration.scope);
-      })
-      .catch((error) => {
-        console.log("Service Worker registration failed:", error);
-      });
-  });
-}
-
-
-// Optional: Handle install prompt (better UX)
 let deferredPrompt;
 
-window.addEventListener("beforeinstallprompt", (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-
-  console.log("Install prompt ready");
-
-  // You can later connect this to a button
+window.addEventListener("DOMContentLoaded", () => {
   const installBtn = document.getElementById("installBtn");
-  if (installBtn) {
+
+  if (!installBtn) return;
+
+  installBtn.style.display = "none";
+
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
     installBtn.style.display = "inline-block";
+  });
 
-    installBtn.addEventListener("click", () => {
-      installBtn.style.display = "none";
-      deferredPrompt.prompt();
+  installBtn.addEventListener("click", async () => {
+    if (!deferredPrompt) return;
 
-      deferredPrompt.userChoice.then((choiceResult) => {
-        if (choiceResult.outcome === "accepted") {
-          console.log("User installed the app");
-        } else {
-          console.log("User dismissed install");
-        }
-        deferredPrompt = null;
-      });
-    });
-  }
+    deferredPrompt.prompt();
+
+    const { outcome } = await deferredPrompt.userChoice;
+
+    if (outcome === "accepted") {
+      console.log("Installed");
+    }
+
+    deferredPrompt = null;
+    installBtn.style.display = "none";
+  });
+
+  window.addEventListener("appinstalled", () => {
+    installBtn.style.display = "none";
+  });
 });
