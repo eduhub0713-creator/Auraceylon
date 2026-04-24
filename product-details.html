@@ -150,9 +150,15 @@
     </div>
   </footer>
 
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="js/firebase.js"></script>
+
+  <!-- App -->
   <script src="js/pwa.js"></script>
   <script src="js/ui.js"></script>
-  <script src="js/products.js"></script>
 
   <script>
     const CART_KEY = "auraceylon-cart";
@@ -258,10 +264,14 @@
       const detailsBox = document.getElementById("productDetailsContainer");
 
       try {
-        const response = await fetch("./data/products.json");
-        const products = await response.json();
+        const snapshot = await db.collection("products").get();
 
-        const product = products.find(item => item.id === productId);
+        const products = snapshot.docs.map(doc => ({
+          docId: doc.id,
+          ...doc.data()
+        }));
+
+        const product = products.find(item => Number(item.id) === Number(productId));
 
         if (!product) {
           if (detailsBox) detailsBox.hidden = true;
@@ -270,8 +280,9 @@
         }
 
         renderProduct(product);
+
       } catch (error) {
-        console.error("Failed to load product details:", error);
+        console.error("Failed to load product:", error);
         if (detailsBox) detailsBox.hidden = true;
         if (notFoundBox) notFoundBox.hidden = false;
       }
