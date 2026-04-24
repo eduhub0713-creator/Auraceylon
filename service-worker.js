@@ -1,4 +1,4 @@
-const CACHE_NAME = "auraceylon-v5";
+const CACHE_NAME = "auraceylon-v6";
 
 const APP_SHELL = [
   "./",
