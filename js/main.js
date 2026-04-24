@@ -21,49 +21,8 @@ const categoryData = [
   }
 ];
 
-const fallbackFeaturedProducts = [
-  {
-    id: 1,
-    name: "Luxury Printed Bed Sheet",
-    category: "Bed Sheets",
-    price: 6500,
-    image: "",
-    featured: true
-  },
-  {
-    id: 2,
-    name: "Soft Cotton Towel Set",
-    category: "Towels",
-    price: 3200,
-    image: "",
-    featured: true
-  },
-  {
-    id: 3,
-    name: "Elegant Women Dress",
-    category: "Clothes",
-    price: 5400,
-    image: "",
-    featured: true
-  }
-];
-
 function formatPrice(price) {
   return `LKR ${Number(price).toLocaleString()}`;
-}
-
-function getCart() {
-  const cart = localStorage.getItem("auraceylon-cart");
-  return cart ? JSON.parse(cart) : [];
-}
-
-function updateCartCount() {
-  const cartCountEl = document.getElementById("cartCount");
-  if (!cartCountEl) return;
-
-  const cart = getCart();
-  const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-  cartCountEl.textContent = totalItems;
 }
 
 function createCategoryCard(category) {
@@ -109,30 +68,41 @@ function renderFeaturedProducts(products) {
 
   const featured = products.filter((product) => product.featured);
 
+  if (featured.length === 0) {
+    featuredProductsEl.innerHTML = `
+      <div class="empty-state">
+        <h3>No featured products yet</h3>
+        <p>Add featured products from the admin panel.</p>
+      </div>
+    `;
+    return;
+  }
+
   featuredProductsEl.innerHTML = featured.map(createProductCard).join("");
 }
 
-async function loadProducts() {
+async function loadProductsFromFirestore() {
   try {
-    const response = await fetch("./data/products.json");
+    const snapshot = await db.collection("products").orderBy("id", "asc").get();
 
-    if (!response.ok) {
-      throw new Error("Could not load products.json");
+    if (snapshot.empty) {
+      return [];
     }
 
-    const products = await response.json();
-    return Array.isArray(products) && products.length ? products : fallbackFeaturedProducts;
+    return snapshot.docs.map((doc) => ({
+      docId: doc.id,
+      ...doc.data()
+    }));
   } catch (error) {
-    console.warn("Using fallback featured products:", error);
-    return fallbackFeaturedProducts;
+    console.error("Failed to load products from Firestore:", error);
+    return [];
   }
 }
 
 async function initHomePage() {
-  updateCartCount();
   renderCategories();
 
-  const products = await loadProducts();
+  const products = await loadProductsFromFirestore();
   renderFeaturedProducts(products);
 }
 
