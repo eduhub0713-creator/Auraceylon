@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" href="assets/logo.jpg" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel | Aura Ceylon</title>
+
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+
+  <style>
+    .admin-page {
+      padding: 60px 0;
+      min-height: 100vh;
+    }
+
+    .admin-grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 24px;
+    }
+
+    .admin-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .admin-card h2 {
+      font-family: "Playfair Display", serif;
+      color: var(--gold-soft);
+      margin-bottom: 16px;
+    }
+
+    .admin-form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .admin-form input,
+    .admin-form select,
+    .admin-form textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #0a0a0a;
+      color: var(--text);
+    }
+
+    .admin-form textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .admin-products {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .admin-product {
+      display: grid;
+      grid-template-columns: 80px 1fr auto;
+      gap: 14px;
+      align-items: center;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      background: rgba(255,255,255,0.02);
+    }
+
+    .admin-product img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    .admin-product h3 {
+      font-family: "Playfair Display", serif;
+      margin-bottom: 4px;
+    }
+
+    .admin-product p {
+      color: var(--text-soft);
+      font-size: 14px;
+    }
+
+    .admin-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .danger-btn {
+      color: #ff6b6b;
+      border-color: rgba(255, 107, 107, 0.4);
+    }
+
+    @media (max-width: 860px) {
+      .admin-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .admin-product {
+        grid-template-columns: 1fr;
+      }
+
+      .admin-product img {
+        width: 100%;
+        height: 180px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <a href="index.html" class="brand">
+        <img src="assets/logo.jpg" class="brand-logo" />
+        <div class="brand-text">
+          <span class="brand-name">AURA CEYLON</span>
+          <span class="brand-tagline">Admin Panel</span>
+        </div>
+      </a>
+
+      <button class="menu-toggle" id="menuToggle">☰</button>
+
+      <nav class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="products.html">Shop</a>
+        <a href="admin.html" class="active">Admin</a>
+        <span id="userArea">
+          <a href="login.html">Login</a>
+        </span>
+      </nav>
+    </div>
+  </header>
+
+  <main class="admin-page">
+    <div class="container">
+      <div class="section-head">
+        <p class="section-label">Aura Ceylon</p>
+        <h2>Admin Dashboard</h2>
+        <p class="section-subtext">Add, edit, and delete store products.</p>
+      </div>
+
+      <div class="admin-grid">
+        <section class="admin-card">
+          <h2 id="formTitle">Add Product</h2>
+
+          <form class="admin-form" id="productForm">
+            <input type="hidden" id="productId" />
+
+            <input type="text" id="productName" placeholder="Product name" required />
+
+            <select id="productCategory" required>
+              <option value="">Select category</option>
+              <option value="Clothes">Clothes</option>
+              <option value="Bed Sheets">Bed Sheets</option>
+              <option value="Towels">Towels</option>
+              <option value="Girls Accessories">Girls Accessories</option>
+            </select>
+
+            <input type="number" id="productPrice" placeholder="Price" required />
+
+            <input type="text" id="productImage" placeholder="Image path e.g. assets/products/dress-1.jpg" required />
+
+            <textarea id="productDescription" placeholder="Product description" required></textarea>
+
+            <label style="color: var(--gold-soft);">
+              <input type="checkbox" id="productFeatured" />
+              Featured product
+            </label>
+
+            <button type="submit" class="btn btn-gold">Save Product</button>
+            <button type="button" class="btn btn-outline" id="resetFormBtn">Reset</button>
+            <button type="button" class="btn btn-small" id="seedProductsBtn">Seed Products to Firestore</button>
+          </form>
+
+          <p id="adminMessage" style="margin-top: 14px; color: var(--gold-soft);"></p>
+        </section>
+
+        <section class="admin-card">
+          <h2>Products</h2>
+          <div class="admin-products" id="adminProducts"></div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="js/firebase.js"></script>
+
+  <script src="js/ui.js"></script>
+
+  <script>
+    const ADMIN_EMAILS = ["eduhub0713@gmail.com"];
+
+    const productForm = document.getElementById("productForm");
+    const productId = document.getElementById("productId");
+    const productName = document.getElementById("productName");
+    const productCategory = document.getElementById("productCategory");
+    const productPrice = document.getElementById("productPrice");
+    const productImage = document.getElementById("productImage");
+    const productDescription = document.getElementById("productDescription");
+    const productFeatured = document.getElementById("productFeatured");
+    const adminProducts = document.getElementById("adminProducts");
+    const adminMessage = document.getElementById("adminMessage");
+    const formTitle = document.getElementById("formTitle");
+    const resetFormBtn = document.getElementById("resetFormBtn");
+    const seedProductsBtn = document.getElementById("seedProductsBtn");
+
+    const starterProducts = [
+      {
+        id: 1,
+        name: "Luxury Printed Bed Sheet",
+        category: "Bed Sheets",
+        price: 6500,
+        image: "assets/products/bedsheet-1.jpg",
+        featured: true,
+        description: "Premium quality bed sheet with elegant patterns and soft fabric for ultimate comfort."
+      },
+      {
+        id: 2,
+        name: "Soft Cotton Towel Set",
+        category: "Towels",
+        price: 3200,
+        image: "assets/products/towel-1.jpg",
+        featured: true,
+        description: "Highly absorbent and soft cotton towel set designed for everyday luxury."
+      },
+      {
+        id: 3,
+        name: "Elegant Women Dress",
+        category: "Clothes",
+        price: 5400,
+        image: "assets/products/dress-1.jpg",
+        featured: true,
+        description: "Stylish and elegant women's dress perfect for both casual and special occasions."
+      },
+      {
+        id: 4,
+        name: "Classic Bed Sheet Set",
+        category: "Bed Sheets",
+        price: 7200,
+        image: "assets/products/bedsheet-2.jpg",
+        featured: false,
+        description: "A refined bed sheet set with a smooth finish and durable stitching."
+      },
+      {
+        id: 5,
+        name: "Premium Bath Towel",
+        category: "Towels",
+        price: 1800,
+        image: "assets/products/towel-2.jpg",
+        featured: false,
+        description: "Soft and durable towel made from high-quality cotton for daily use."
+      },
+      {
+        id: 6,
+        name: "Girls Hair Accessories Set",
+        category: "Girls Accessories",
+        price: 1200,
+        image: "assets/products/accessory-1.jpg",
+        featured: true,
+        description: "Beautiful and colorful hair accessories set for girls with premium finish."
+      },
+      {
+        id: 7,
+        name: "Luxury Evening Dress",
+        category: "Clothes",
+        price: 8500,
+        image: "assets/products/dress-2.jpg",
+        featured: false,
+        description: "Elegant evening dress designed with a premium touch for special occasions."
+      },
+      {
+        id: 8,
+        name: "Decorative Cushion Cover",
+        category: "Bed Sheets",
+        price: 900,
+        image: "assets/products/bedsheet-3.jpg",
+        featured: false,
+        description: "Stylish cushion cover to enhance the elegance of your home decor."
+      }
+    ];
+
+    function setAdminMessage(message) {
+      adminMessage.textContent = message;
+    }
+
+    function resetForm() {
+      productId.value = "";
+      productForm.reset();
+      formTitle.textContent = "Add Product";
+    }
+
+    function productCard(product) {
+      return `
+        <article class="admin-product">
+          <img src="${product.image}" alt="${product.name}" />
+          <div>
+            <h3>${product.name}</h3>
+            <p>${product.category} • LKR ${Number(product.price).toLocaleString()}</p>
+            <p>${product.featured ? "Featured" : "Normal"}</p>
+          </div>
+          <div class="admin-actions">
+            <button class="btn btn-small" onclick="editProduct('${product.docId}')">Edit</button>
+            <button class="btn btn-small danger-btn" onclick="deleteProduct('${product.docId}')">Delete</button>
+          </div>
+        </article>
+      `;
+    }
+
+    async function loadAdminProducts() {
+      const snapshot = await db.collection("products").orderBy("id", "asc").get();
+
+      if (snapshot.empty) {
+        adminProducts.innerHTML = "<p>No products found. Click Seed Products first.</p>";
+        return;
+      }
+
+      const products = snapshot.docs.map(doc => ({
+        docId: doc.id,
+        ...doc.data()
+      }));
+
+      adminProducts.innerHTML = products.map(productCard).join("");
+    }
+
+    window.editProduct = async function(docId) {
+      const doc = await db.collection("products").doc(docId).get();
+      if (!doc.exists) return;
+
+      const product = doc.data();
+
+      productId.value = docId;
+      productName.value = product.name || "";
+      productCategory.value = product.category || "";
+      productPrice.value = product.price || "";
+      productImage.value = product.image || "";
+      productDescription.value = product.description || "";
+      productFeatured.checked = Boolean(product.featured);
+
+      formTitle.textContent = "Edit Product";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    window.deleteProduct = async function(docId) {
+      const confirmed = confirm("Delete this product?");
+      if (!confirmed) return;
+
+      await db.collection("products").doc(docId).delete();
+      showToast("Product deleted");
+      loadAdminProducts();
+    };
+
+    productForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const existingId = productId.value;
+
+      const productData = {
+        name: productName.value.trim(),
+        category: productCategory.value,
+        price: Number(productPrice.value),
+        image: productImage.value.trim(),
+        description: productDescription.value.trim(),
+        featured: productFeatured.checked,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      try {
+        if (existingId) {
+          await db.collection("products").doc(existingId).set(productData, { merge: true });
+          showToast("Product updated");
+        } else {
+          productData.id = Date.now();
+          productData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+          await db.collection("products").add(productData);
+          showToast("Product added");
+        }
+
+        resetForm();
+        loadAdminProducts();
+      } catch (error) {
+        console.error(error);
+        setAdminMessage(error.message);
+      }
+    });
+
+    resetFormBtn.addEventListener("click", resetForm);
+
+    seedProductsBtn.addEventListener("click", async () => {
+      const confirmed = confirm("This will add starter products to Firestore. Continue?");
+      if (!confirmed) return;
+
+      for (const product of starterProducts) {
+        await db.collection("products").doc(String(product.id)).set({
+          ...product,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }
+
+      showToast("Products seeded");
+      loadAdminProducts();
+    });
+
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      if (!ADMIN_EMAILS.includes(user.email)) {
+        document.body.innerHTML = `
+          <main class="section">
+            <div class="container cta-box">
+              <h2>Access Denied</h2>
+              <p>You do not have permission to access the admin panel.</p>
+              <a href="index.html" class="btn btn-gold">Go Home</a>
+            </div>
+          </main>
+        `;
+        return;
+      }
+
+      await loadAdminProducts();
+    });
+  </script>
+</body>
+</html>
