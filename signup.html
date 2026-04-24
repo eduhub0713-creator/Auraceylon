@@ -342,7 +342,12 @@
         showAuthMessage("Opening Google signup...");
 
         const provider = new firebase.auth.GoogleAuthProvider();
-        const result = await auth.signInWithRedirect(provider);
+
+        provider.setCustomParameters({
+          prompt: "select_account"
+        });
+
+        const result = await auth.signInWithPopup(provider);
         const user = result.user;
 
         await createUserProfile(user, user.displayName);
@@ -358,21 +363,6 @@
         showAuthMessage(error.message);
       }
     });
-
-    // Handle redirect result (Google login)
-    auth.getRedirectResult()
-      .then((result) => {
-        if (result.user) {
-          showToast("Google login successful");
-          window.location.href = "index.html";
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-        if (authMessage) {
-          authMessage.textContent = error.message;
-        }
-      });
   </script>
 </body>
 </html>
