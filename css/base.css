@@ -595,3 +595,16 @@ ul {
   opacity: 1;
   transform: translateY(0);
 }
+
+.nav-user-name {
+  color: var(--gold-soft);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.logout-btn {
+  min-height: 36px;
+  padding: 8px 14px;
+  margin-left: 8px;
+}
