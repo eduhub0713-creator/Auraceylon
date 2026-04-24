@@ -1,36 +1,31 @@
-const categoryData = [
-  {
-    name: "Clothes",
-    description: "Elegant styles for everyday and occasion wear.",
-    link: "products.html?category=Clothes"
-  },
-  {
-    name: "Bed Sheets",
-    description: "Premium comfort with luxury texture and finish.",
-    link: "products.html?category=Bed%20Sheets"
-  },
-  {
-    name: "Towels",
-    description: "Soft, refined essentials made for daily comfort.",
-    link: "products.html?category=Towels"
-  },
-  {
-    name: "Girls Accessories",
-    description: "Beautiful finishing touches with a graceful feel.",
-    link: "products.html?category=Girls%20Accessories"
+async function loadCategoriesFromFirestore() {
+  try {
+    const snapshot = await db.collection("categories").orderBy("name", "asc").get();
+
+    if (snapshot.empty) return [];
+
+    return snapshot.docs.map((doc) => ({
+      docId: doc.id,
+      ...doc.data()
+    }));
+  } catch (error) {
+    console.error("Failed to load categories:", error);
+    return [];
   }
-];
+}
 
 function formatPrice(price) {
   return `LKR ${Number(price).toLocaleString()}`;
 }
 
 function createCategoryCard(category) {
+  const link = category.link || `products.html?category=${encodeURIComponent(category.name)}`;
+
   return `
-    <a href="${category.link}" class="category-card">
+    <a href="${link}" class="category-card">
       <div class="category-icon">✦</div>
       <h3>${category.name}</h3>
-      <p>${category.description}</p>
+      <p>${category.description || ""}</p>
     </a>
   `;
 }
@@ -55,11 +50,23 @@ function createProductCard(product) {
   `;
 }
 
-function renderCategories() {
+async function renderCategories() {
   const categoryGrid = document.querySelector(".category-grid");
   if (!categoryGrid) return;
 
-  categoryGrid.innerHTML = categoryData.map(createCategoryCard).join("");
+  const categories = await loadCategoriesFromFirestore();
+
+  if (categories.length === 0) {
+    categoryGrid.innerHTML = `
+      <div class="empty-state">
+        <h3>No categories yet</h3>
+        <p>Add categories from the admin panel.</p>
+      </div>
+    `;
+    return;
+  }
+
+  categoryGrid.innerHTML = categories.map(createCategoryCard).join("");
 }
 
 function renderFeaturedProducts(products) {
@@ -85,22 +92,20 @@ async function loadProductsFromFirestore() {
   try {
     const snapshot = await db.collection("products").orderBy("id", "asc").get();
 
-    if (snapshot.empty) {
-      return [];
-    }
+    if (snapshot.empty) return [];
 
     return snapshot.docs.map((doc) => ({
       docId: doc.id,
       ...doc.data()
     }));
   } catch (error) {
-    console.error("Failed to load products from Firestore:", error);
+    console.error("Failed to load products:", error);
     return [];
   }
 }
 
 async function initHomePage() {
-  renderCategories();
+  await renderCategories();
 
   const products = await loadProductsFromFirestore();
   renderFeaturedProducts(products);
