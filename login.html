@@ -310,6 +310,21 @@
         console.log("Already logged in:", user.email);
       }
     });
+
+    // Handle redirect result (Google login)
+    auth.getRedirectResult()
+      .then((result) => {
+        if (result.user) {
+          showToast("Google login successful");
+          window.location.href = "index.html";
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        if (authMessage) {
+          authMessage.textContent = error.message;
+        }
+      });
   </script>
 </body>
 </html>
