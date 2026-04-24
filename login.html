@@ -291,7 +291,7 @@
         showAuthMessage("Opening Google login...");
 
         const provider = new firebase.auth.GoogleAuthProvider();
-        await auth.signInWithPopup(provider);
+        await auth.signInWithRedirect(provider);
 
         showAuthMessage("Google login successful.");
         showToast("Google login successful");
