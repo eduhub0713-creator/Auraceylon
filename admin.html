@@ -172,6 +172,8 @@
 
             <input type="text" id="productImage" placeholder="Image path e.g. assets/products/dress-1.jpg" required />
 
+            <img id="imagePreview" style="width:100%; max-height:200px; object-fit:cover; border-radius:10px; margin-top:10px; display:none;" />
+
             <textarea id="productDescription" placeholder="Product description" required></textarea>
 
             <label style="color: var(--gold-soft);">
@@ -190,6 +192,11 @@
         <section class="admin-card">
           <h2>Products</h2>
           <div class="admin-products" id="adminProducts"></div>
+        </section>
+
+        <section class="admin-card">
+          <h2>Orders</h2>
+          <div id="adminOrders"></div>
         </section>
       </div>
     </div>
@@ -295,6 +302,64 @@
       }
     ];
 
+    const imagePreview = document.getElementById("imagePreview");
+
+    productImage.addEventListener("input", () => {
+      const url = productImage.value.trim();
+
+      if (url) {
+        imagePreview.src = url;
+        imagePreview.style.display = "block";
+      } else {
+        imagePreview.style.display = "none";
+      }
+    });
+
+    const adminOrders = document.getElementById("adminOrders");
+
+    function orderCard(order) {
+      return `
+        <div class="admin-product">
+          <div>
+            <h3>${order.id}</h3>
+            <p>${order.userEmail}</p>
+            <p>Total: LKR ${Number(order.summary.total).toLocaleString()}</p>
+            <p>Status: ${order.status}</p>
+          </div>
+
+          <div class="admin-actions">
+            <select onchange="updateOrderStatus('${order.id}', this.value)">
+              <option ${order.status === "new" ? "selected" : ""}>new</option>
+              <option ${order.status === "processing" ? "selected" : ""}>processing</option>
+              <option ${order.status === "delivered" ? "selected" : ""}>delivered</option>
+            </select>
+          </div>
+        </div>
+      `;
+    }
+
+    async function loadOrders() {
+      const snapshot = await db.collection("orders")
+        .orderBy("createdAt", "desc")
+        .get();
+
+      if (snapshot.empty) {
+        adminOrders.innerHTML = "<p>No orders yet.</p>";
+        return;
+      }
+
+      const orders = snapshot.docs.map(doc => doc.data());
+
+      adminOrders.innerHTML = orders.map(orderCard).join("");
+    }
+
+    window.updateOrderStatus = async function(orderId, status) {
+      await db.collection("orders").doc(orderId).update({ status });
+
+      showToast("Order updated");
+      loadOrders();
+    };
+
     function setAdminMessage(message) {
       adminMessage.textContent = message;
     }
@@ -354,6 +419,9 @@
 
       formTitle.textContent = "Edit Product";
       window.scrollTo({ top: 0, behavior: "smooth" });
+
+      imagePreview.src = product.image || "";
+      imagePreview.style.display = product.image ? "block" : "none";
     };
 
     window.deleteProduct = async function(docId) {
@@ -437,6 +505,7 @@
       }
 
       await loadAdminProducts();
+      await loadOrders();
     });
   </script>
 </body>
