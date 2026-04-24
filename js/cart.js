@@ -1,6 +1,8 @@
 const CART_STORAGE_KEY = "auraceylon-cart";
 const DELIVERY_FEE = 0;
 
+let currentUser = null;
+
 function getCart() {
   const cart = localStorage.getItem(CART_STORAGE_KEY);
   return cart ? JSON.parse(cart) : [];
@@ -8,6 +10,28 @@ function getCart() {
 
 function saveCart(cart) {
   localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+}
+
+async function saveUserCart(cart) {
+  if (!currentUser) return;
+
+  await db.collection("users").doc(currentUser.uid).set(
+    {
+      cart,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    },
+    { merge: true }
+  );
+}
+
+async function loadUserCart(user) {
+  const doc = await db.collection("users").doc(user.uid).get();
+
+  if (doc.exists && Array.isArray(doc.data().cart)) {
+    saveCart(doc.data().cart);
+  } else {
+    saveCart([]);
+  }
 }
 
 function formatPrice(price) {
@@ -24,7 +48,9 @@ function updateCartCount() {
 }
 
 function calculateSubtotal(cart) {
-  return cart.reduce((sum, item) => sum + (Number(item.price) * Number(item.quantity || 1)), 0);
+  return cart.reduce((sum, item) => {
+    return sum + Number(item.price) * Number(item.quantity || 1);
+  }, 0);
 }
 
 function updateSummary(cart) {
@@ -44,21 +70,14 @@ function updateSummary(cart) {
   if (summaryTotal) summaryTotal.textContent = formatPrice(total);
 
   if (checkoutBtn) {
-    if (cart.length === 0) {
-      checkoutBtn.classList.add("disabled");
-      checkoutBtn.setAttribute("aria-disabled", "true");
-      checkoutBtn.addEventListener("click", preventCheckoutWhenEmpty);
+    if (!currentUser) {
+      checkoutBtn.href = "login.html";
+      checkoutBtn.textContent = "Login to Checkout";
     } else {
-      checkoutBtn.classList.remove("disabled");
-      checkoutBtn.removeAttribute("aria-disabled");
-      checkoutBtn.removeEventListener("click", preventCheckoutWhenEmpty);
+      checkoutBtn.href = "checkout.html";
+      checkoutBtn.textContent = "Proceed to Checkout";
     }
   }
-}
-
-function preventCheckoutWhenEmpty(event) {
-  event.preventDefault();
-  alert("Your cart is empty.");
 }
 
 function createCartItem(item) {
@@ -118,7 +137,7 @@ function renderCart() {
   updateCartCount();
 }
 
-function updateItemQuantity(id, quantity) {
+async function updateItemQuantity(id, quantity) {
   const cart = getCart();
   const item = cart.find((product) => Number(product.id) === Number(id));
 
@@ -126,17 +145,20 @@ function updateItemQuantity(id, quantity) {
 
   item.quantity = Math.max(1, Number(quantity) || 1);
   saveCart(cart);
+  await saveUserCart(cart);
   renderCart();
 }
 
-function removeItem(id) {
+async function removeItem(id) {
   const cart = getCart().filter((product) => Number(product.id) !== Number(id));
   saveCart(cart);
+  await saveUserCart(cart);
   renderCart();
 }
 
-function clearCart() {
-  localStorage.removeItem(CART_STORAGE_KEY);
+async function clearCart() {
+  saveCart([]);
+  await saveUserCart([]);
   renderCart();
 }
 
@@ -144,10 +166,10 @@ function attachQuantityEvents() {
   const qtyInputs = document.querySelectorAll(".cart-qty-input");
 
   qtyInputs.forEach((input) => {
-    input.addEventListener("change", (event) => {
+    input.addEventListener("change", async (event) => {
       const id = event.target.dataset.id;
       const quantity = event.target.value;
-      updateItemQuantity(id, quantity);
+      await updateItemQuantity(id, quantity);
     });
   });
 }
@@ -156,9 +178,9 @@ function attachRemoveEvents() {
   const removeButtons = document.querySelectorAll(".remove-btn");
 
   removeButtons.forEach((button) => {
-    button.addEventListener("click", () => {
+    button.addEventListener("click", async () => {
       const id = button.dataset.id;
-      removeItem(id);
+      await removeItem(id);
     });
   });
 }
@@ -167,24 +189,35 @@ function attachClearCartEvent() {
   const clearCartBtn = document.getElementById("clearCartBtn");
   if (!clearCartBtn) return;
 
-  clearCartBtn.addEventListener("click", () => {
+  clearCartBtn.addEventListener("click", async () => {
     const cart = getCart();
 
     if (cart.length === 0) {
-      alert("Your cart is already empty.");
+      showToast("Your cart is already empty.");
       return;
     }
 
     const confirmed = confirm("Are you sure you want to clear your cart?");
     if (confirmed) {
-      clearCart();
+      await clearCart();
+      showToast("Cart cleared.");
     }
   });
 }
 
 function initCartPage() {
-  renderCart();
-  attachClearCartEvent();
+  auth.onAuthStateChanged(async (user) => {
+    currentUser = user;
+
+    if (user) {
+      await loadUserCart(user);
+    } else {
+      saveCart([]);
+    }
+
+    renderCart();
+    attachClearCartEvent();
+  });
 }
 
 document.addEventListener("DOMContentLoaded", initCartPage);
