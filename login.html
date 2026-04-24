@@ -278,7 +278,10 @@
         showToast("Login successful");
 
         setTimeout(() => {
-          window.location.href = "index.html";
+          const redirect = localStorage.getItem("redirectAfterLogin");
+          localStorage.removeItem("redirectAfterLogin");
+
+          window.location.href = redirect || "index.html";
         }, 700);
       } catch (error) {
         console.error(error);
@@ -302,7 +305,10 @@
         showToast("Google login successful");
 
         setTimeout(() => {
-          window.location.href = "index.html";
+          const redirect = localStorage.getItem("redirectAfterLogin");
+          localStorage.removeItem("redirectAfterLogin");
+
+          window.location.href = redirect || "index.html";
         }, 700);
       } catch (error) {
         console.error(error);
