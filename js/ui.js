@@ -1,6 +1,6 @@
 const UI_CART_KEY = "auraceylon-cart";
 
-// ===== CART (LOCAL) =====
+// ===== CART LOCAL =====
 function getUICart() {
   try {
     const cart = localStorage.getItem(UI_CART_KEY);
@@ -15,7 +15,6 @@ function saveUICart(cart) {
   localStorage.setItem(UI_CART_KEY, JSON.stringify(cart));
 }
 
-// ===== CART COUNT =====
 function getUICartCount() {
   const cart = getUICart();
   return cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
@@ -24,32 +23,60 @@ function getUICartCount() {
 function updateGlobalCartCount() {
   const cartCountEl = document.getElementById("cartCount");
   if (!cartCountEl) return;
-
   cartCountEl.textContent = getUICartCount();
 }
 
-// ===== FIRESTORE SYNC =====
-async function syncCartToFirestore(user) {
-  if (!user) return;
+// ===== USER NAME HELPERS =====
+function getUserDisplayName(user) {
+  if (!user) return "";
 
-  const cart = getUICart();
+  if (user.displayName) {
+    return user.displayName.split(" ")[0];
+  }
 
-  try {
-    await db.collection("users")
-      .doc(user.uid)
-      .set({ cart }, { merge: true });
-  } catch (err) {
-    console.error("Firestore sync failed:", err);
+  if (user.email) {
+    return user.email.split("@")[0];
+  }
+
+  return "User";
+}
+
+function updateUserArea(user) {
+  const userArea = document.getElementById("userArea");
+  if (!userArea) return;
+
+  if (user) {
+    const name = getUserDisplayName(user);
+
+    userArea.innerHTML = `
+      <span class="nav-user-name">Hi, ${name}</span>
+      <button id="logoutBtn" class="btn btn-small logout-btn">Logout</button>
+    `;
+
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", async () => {
+        await firebase.auth().signOut();
+        saveUICart([]);
+        updateGlobalCartCount();
+        showToast("Logged out");
+        window.location.href = "index.html";
+      });
+    }
+  } else {
+    userArea.innerHTML = `<a href="login.html" id="loginBtn">Login</a>`;
   }
 }
 
+// ===== FIRESTORE CART SYNC =====
 async function loadCartFromFirestore(user) {
   if (!user) return;
 
   try {
     const doc = await db.collection("users").doc(user.uid).get();
 
-    if (doc.exists && doc.data().cart) {
+    if (doc.exists && Array.isArray(doc.data().cart)) {
       saveUICart(doc.data().cart);
       updateGlobalCartCount();
     }
@@ -60,14 +87,18 @@ async function loadCartFromFirestore(user) {
 
 // ===== AUTH STATE =====
 function initAuthListener() {
-  if (!window.firebase) return;
+  if (!window.firebase || !firebase.auth) return;
 
   firebase.auth().onAuthStateChanged(async (user) => {
+    updateUserArea(user);
+
     if (user) {
       console.log("User logged in:", user.email);
       await loadCartFromFirestore(user);
     } else {
       console.log("User logged out");
+      saveUICart([]);
+      updateGlobalCartCount();
     }
   });
 }
