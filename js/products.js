@@ -53,17 +53,13 @@ function sortProducts(products, sortType) {
 
   switch (sortType) {
     case "low-high":
-      return sorted.sort((a, b) => a.price - b.price);
-
+      return sorted.sort((a, b) => Number(a.price) - Number(b.price));
     case "high-low":
-      return sorted.sort((a, b) => b.price - a.price);
-
+      return sorted.sort((a, b) => Number(b.price) - Number(a.price));
     case "name-az":
       return sorted.sort((a, b) => a.name.localeCompare(b.name));
-
     case "name-za":
       return sorted.sort((a, b) => b.name.localeCompare(a.name));
-
     default:
       return sorted;
   }
@@ -80,6 +76,7 @@ function filterProducts() {
 
   if (activeSearch.trim()) {
     const query = activeSearch.toLowerCase().trim();
+
     filtered = filtered.filter((product) => {
       return (
         product.name.toLowerCase().includes(query) ||
@@ -161,16 +158,18 @@ function attachSortEvent() {
 
 async function loadProductsData() {
   try {
-    const response = await fetch("./data/products.json");
+    const snapshot = await db.collection("products").orderBy("id", "asc").get();
 
-    if (!response.ok) {
-      throw new Error("Failed to load products data");
+    if (snapshot.empty) {
+      return [];
     }
 
-    const data = await response.json();
-    return Array.isArray(data) ? data : [];
+    return snapshot.docs.map((doc) => ({
+      docId: doc.id,
+      ...doc.data()
+    }));
   } catch (error) {
-    console.error("Error loading products:", error);
+    console.error("Error loading Firestore products:", error);
     return [];
   }
 }
