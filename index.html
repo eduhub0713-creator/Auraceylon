@@ -52,8 +52,6 @@
   <meta name="twitter:title" content="Aura Ceylon" />
   <meta name="twitter:description" content="Luxury fashion & home collection." />
   <meta name="twitter:image" content="https://auraceylon.com.lk/assets/banner.jpg" />
-
-  <img src="assets/banner.jpg" alt="Aura Ceylon luxury fashion and home collection" />
 </head>
 <body>
 
@@ -76,6 +74,11 @@
     <a href="about.html">About</a>
     <a href="contact.html">Contact</a>
     <a href="cart.html">Cart <span id="cartCount">0</span></a>
+
+    <!-- AUTH AREA -->
+    <span id="userArea">
+      <a href="login.html" id="loginBtn">Login</a>
+    </span>
   </nav>
 </div>
 ```
@@ -180,6 +183,33 @@
       "addressCountry": "LK"
     }
   }
+  </script>
+
+  <script>
+  firebase.auth().onAuthStateChanged((user) => {
+    const userArea = document.getElementById("userArea");
+
+    if (!userArea) return;
+
+    if (user) {
+      userArea.innerHTML = `
+        <span style="color:gold; font-size:14px;">
+          ${user.email}
+        </span>
+        <button id="logoutBtn" class="btn btn-small">Logout</button>
+      `;
+
+      document.getElementById("logoutBtn").addEventListener("click", () => {
+        firebase.auth().signOut().then(() => {
+          showToast("Logged out");
+          location.reload();
+        });
+      });
+
+    } else {
+      userArea.innerHTML = `<a href="login.html">Login</a>`;
+    }
+  });
   </script>
 
 </body>
