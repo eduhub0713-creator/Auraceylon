@@ -142,4 +142,16 @@ function initUI() {
   initAuthListener();
 }
 
+function protectPage(options = {}) {
+  const { requireAuth = false } = options;
+
+  firebase.auth().onAuthStateChanged((user) => {
+    if (requireAuth && !user) {
+      localStorage.setItem("redirectAfterLogin", window.location.href);
+      showToast("Please login to continue");
+      window.location.href = "login.html";
+    }
+  });
+}
+
 document.addEventListener("DOMContentLoaded", initUI);
