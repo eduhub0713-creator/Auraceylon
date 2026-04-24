@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" href="assets/logo.jpg" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>My Profile | Aura Ceylon</title>
+  <meta name="description" content="Manage your Aura Ceylon profile and account details." />
+  <meta name="theme-color" content="#000000" />
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="assets/icon-192.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+
+  <style>
+    .profile-page {
+      min-height: 100vh;
+      padding: 70px 0;
+    }
+
+    .profile-layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+
+    .profile-card,
+    .profile-panel {
+      background: linear-gradient(to bottom, rgba(255,255,255,0.035), rgba(255,255,255,0.01));
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow);
+      padding: 26px;
+    }
+
+    .profile-card {
+      text-align: center;
+    }
+
+    .profile-avatar {
+      width: 110px;
+      height: 110px;
+      margin: 0 auto 18px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid var(--border-strong);
+      background: #111;
+    }
+
+    .profile-card h2,
+    .profile-panel h2 {
+      font-family: "Playfair Display", serif;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .profile-email {
+      color: var(--text-soft);
+      font-size: 14px;
+      margin-bottom: 18px;
+      word-break: break-word;
+    }
+
+    .profile-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .profile-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 22px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    .form-group label {
+      color: var(--gold-soft);
+      font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      min-height: 48px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #0a0a0a;
+      color: var(--text);
+    }
+
+    .form-group textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--gold);
+    }
+
+    .profile-message {
+      margin-top: 16px;
+      color: var(--gold-soft);
+      font-size: 14px;
+      min-height: 22px;
+    }
+
+    .profile-quick-links {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    .quick-link-card {
+      padding: 18px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+      transition: var(--transition);
+    }
+
+    .quick-link-card:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-3px);
+    }
+
+    .quick-link-card h3 {
+      font-family: "Playfair Display", serif;
+      color: var(--gold-soft);
+      margin-bottom: 6px;
+    }
+
+    .quick-link-card p {
+      color: var(--text-soft);
+      font-size: 14px;
+    }
+
+    @media (max-width: 860px) {
+      .profile-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .profile-page {
+        padding: 50px 0;
+      }
+
+      .profile-form,
+      .profile-quick-links {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <a href="index.html" class="brand">
+        <img src="assets/logo.jpg" alt="Aura Ceylon Logo" class="brand-logo" />
+        <div class="brand-text">
+          <span class="brand-name">AURA CEYLON</span>
+          <span class="brand-tagline">Elegant • Timeless • Premium</span>
+        </div>
+      </a>
+
+      <button class="menu-toggle" id="menuToggle" aria-label="Open menu">☰</button>
+
+      <nav class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="products.html">Shop</a>
+        <a href="profile.html" class="active">Profile</a>
+        <a href="cart.html">Cart <span id="cartCount">0</span></a>
+        <span id="userArea">
+          <a href="login.html" id="loginBtn">Login</a>
+        </span>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="section section-dark">
+      <div class="container section-head">
+        <p class="section-label">My Account</p>
+        <h2>Profile</h2>
+        <p class="section-subtext">
+          Manage your Aura Ceylon account details and shopping preferences.
+        </p>
+      </div>
+    </section>
+
+    <section class="profile-page">
+      <div class="container profile-layout">
+        <aside class="profile-card">
+          <img src="assets/logo.jpg" alt="Profile picture" class="profile-avatar" id="profileAvatar" />
+          <h2 id="profileName">Loading...</h2>
+          <p class="profile-email" id="profileEmail">Loading...</p>
+
+          <div class="profile-actions">
+            <a href="orders.html" class="btn btn-gold">My Orders</a>
+            <a href="products.html" class="btn btn-outline">Continue Shopping</a>
+            <button class="btn btn-small" id="profileLogoutBtn">Logout</button>
+          </div>
+        </aside>
+
+        <section class="profile-panel">
+          <p class="section-label">Account Details</p>
+          <h2>Edit Profile</h2>
+          <p class="section-subtext">
+            Save your details so checkout becomes faster next time.
+          </p>
+
+          <form class="profile-form" id="profileForm">
+            <div class="form-group">
+              <label for="fullName">Full Name</label>
+              <input type="text" id="fullName" placeholder="Your full name" required />
+            </div>
+
+            <div class="form-group">
+              <label for="phoneNumber">Phone Number</label>
+              <input type="tel" id="phoneNumber" placeholder="07X XXX XXXX" />
+            </div>
+
+            <div class="form-group">
+              <label for="city">City</label>
+              <input type="text" id="city" placeholder="Your city" />
+            </div>
+
+            <div class="form-group">
+              <label for="emailAddress">Email</label>
+              <input type="email" id="emailAddress" disabled />
+            </div>
+
+            <div class="form-group full">
+              <label for="addressLine">Delivery Address</label>
+              <textarea id="addressLine" placeholder="House number, street, city"></textarea>
+            </div>
+
+            <div class="form-group full">
+              <button type="submit" class="btn btn-gold">Save Profile</button>
+            </div>
+          </form>
+
+          <div class="profile-message" id="profileMessage"></div>
+
+          <div class="profile-quick-links">
+            <a href="orders.html" class="quick-link-card">
+              <h3>Order History</h3>
+              <p>View your previous Aura Ceylon orders.</p>
+            </a>
+
+            <a href="cart.html" class="quick-link-card">
+              <h3>Your Cart</h3>
+              <p>Continue with your saved shopping cart.</p>
+            </a>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-bottom">
+      <p>© 2026 Aura Ceylon</p>
+      <div class="footer-legal-links">
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="terms.html">Terms</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="js/firebase.js"></script>
+
+  <!-- App Scripts -->
+  <script src="js/pwa.js"></script>
+  <script src="js/ui.js"></script>
+
+  <script>
+    const profileAvatar = document.getElementById("profileAvatar");
+    const profileName = document.getElementById("profileName");
+    const profileEmail = document.getElementById("profileEmail");
+    const profileForm = document.getElementById("profileForm");
+    const profileMessage = document.getElementById("profileMessage");
+    const profileLogoutBtn = document.getElementById("profileLogoutBtn");
+
+    const fullNameInput = document.getElementById("fullName");
+    const phoneNumberInput = document.getElementById("phoneNumber");
+    const cityInput = document.getElementById("city");
+    const emailAddressInput = document.getElementById("emailAddress");
+    const addressLineInput = document.getElementById("addressLine");
+
+    let currentProfileUser = null;
+
+    function setProfileMessage(message) {
+      profileMessage.textContent = message;
+    }
+
+    async function loadUserProfile(user) {
+      currentProfileUser = user;
+
+      profileName.textContent = user.displayName || user.email.split("@")[0];
+      profileEmail.textContent = user.email;
+      emailAddressInput.value = user.email || "";
+
+      if (user.photoURL) {
+        profileAvatar.src = user.photoURL;
+      }
+
+      const doc = await db.collection("users").doc(user.uid).get();
+
+      if (doc.exists) {
+        const data = doc.data();
+
+        fullNameInput.value = data.fullName || user.displayName || "";
+        phoneNumberInput.value = data.phoneNumber || "";
+        cityInput.value = data.city || "";
+        addressLineInput.value = data.addressLine || "";
+      } else {
+        fullNameInput.value = user.displayName || "";
+      }
+    }
+
+    profileForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      if (!currentProfileUser) return;
+
+      const profileData = {
+        uid: currentProfileUser.uid,
+        fullName: fullNameInput.value.trim(),
+        email: currentProfileUser.email,
+        phoneNumber: phoneNumberInput.value.trim(),
+        city: cityInput.value.trim(),
+        addressLine: addressLineInput.value.trim(),
+        photoURL: currentProfileUser.photoURL || "",
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      try {
+        setProfileMessage("Saving profile...");
+
+        await db.collection("users").doc(currentProfileUser.uid).set(profileData, { merge: true });
+
+        await currentProfileUser.updateProfile({
+          displayName: profileData.fullName
+        });
+
+        profileName.textContent = profileData.fullName || currentProfileUser.email.split("@")[0];
+
+        setProfileMessage("Profile saved successfully.");
+        showToast("Profile saved");
+      } catch (error) {
+        console.error(error);
+        setProfileMessage(error.message);
+      }
+    });
+
+    profileLogoutBtn.addEventListener("click", async () => {
+      await auth.signOut();
+      showToast("Logged out");
+      window.location.href = "index.html";
+    });
+
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      try {
+        await loadUserProfile(user);
+      } catch (error) {
+        console.error(error);
+        setProfileMessage(error.message);
+      }
+    });
+  </script>
+</body>
+</html>
