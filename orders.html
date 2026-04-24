@@ -189,6 +189,8 @@ auth.onAuthStateChanged(async (user) => {
     ordersContainer.innerHTML = "<p>Error loading orders.</p>";
   }
 });
+
+protectPage({ requireAuth: true });
 </script>
 
 </body>
