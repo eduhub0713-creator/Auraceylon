@@ -195,11 +195,32 @@ async function initProductsPage() {
     sortSelect.value = activeSort;
   }
 
+  await loadCategoryFilters();
   setActiveCategoryButton();
   attachCategoryEvents();
   attachSearchEvent();
   attachSortEvent();
   renderProducts();
+}
+
+async function loadCategoryFilters() {
+  const categoryFilters = document.getElementById("categoryFilters");
+  if (!categoryFilters) return;
+
+  try {
+    const snapshot = await db.collection("categories").orderBy("name", "asc").get();
+
+    let html = `<button class="filter-btn active" data-category="All">All</button>`;
+
+    snapshot.forEach((doc) => {
+      const category = doc.data();
+      html += `<button class="filter-btn" data-category="${category.name}">${category.name}</button>`;
+    });
+
+    categoryFilters.innerHTML = html;
+  } catch (error) {
+    console.error("Failed to load category filters:", error);
+  }
 }
 
 document.addEventListener("DOMContentLoaded", initProductsPage);
