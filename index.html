@@ -184,34 +184,6 @@
     }
   }
   </script>
-
-  <script>
-  firebase.auth().onAuthStateChanged((user) => {
-    const userArea = document.getElementById("userArea");
-
-    if (!userArea) return;
-
-    if (user) {
-      userArea.innerHTML = `
-        <span style="color:gold; font-size:14px;">
-          ${user.email}
-        </span>
-        <button id="logoutBtn" class="btn btn-small">Logout</button>
-      `;
-
-      document.getElementById("logoutBtn").addEventListener("click", () => {
-        firebase.auth().signOut().then(() => {
-          showToast("Logged out");
-          location.reload();
-        });
-      });
-
-    } else {
-      userArea.innerHTML = `<a href="login.html">Login</a>`;
-    }
-  });
-  </script>
-
 </body>
 </html>
 
