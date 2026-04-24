@@ -198,6 +198,22 @@
           <h2>Orders</h2>
           <div id="adminOrders"></div>
         </section>
+
+        <section class="admin-card">
+          <h2>Categories</h2>
+
+          <form class="admin-form" id="categoryForm">
+            <input type="hidden" id="categoryId" />
+            <input type="text" id="categoryName" placeholder="Category name" required />
+            <textarea id="categoryDescription" placeholder="Category description" required></textarea>
+
+            <button type="submit" class="btn btn-gold">Save Category</button>
+            <button type="button" class="btn btn-outline" id="resetCategoryBtn">Reset Category</button>
+            <button type="button" class="btn btn-small" id="seedCategoriesBtn">Seed Categories</button>
+          </form>
+
+          <div class="admin-products" id="adminCategories" style="margin-top:16px;"></div>
+        </section>
       </div>
     </div>
   </main>
@@ -226,6 +242,33 @@
     const formTitle = document.getElementById("formTitle");
     const resetFormBtn = document.getElementById("resetFormBtn");
     const seedProductsBtn = document.getElementById("seedProductsBtn");
+
+    const categoryForm = document.getElementById("categoryForm");
+    const categoryId = document.getElementById("categoryId");
+    const categoryName = document.getElementById("categoryName");
+    const categoryDescription = document.getElementById("categoryDescription");
+    const adminCategories = document.getElementById("adminCategories");
+    const resetCategoryBtn = document.getElementById("resetCategoryBtn");
+    const seedCategoriesBtn = document.getElementById("seedCategoriesBtn");
+
+    const starterCategories = [
+      {
+        name: "Clothes",
+        description: "Elegant styles for everyday and occasion wear."
+      },
+      {
+        name: "Bed Sheets",
+        description: "Premium comfort with luxury texture and finish."
+      },
+      {
+        name: "Towels",
+        description: "Soft, refined essentials made for daily comfort."
+      },
+      {
+        name: "Girls Accessories",
+        description: "Beautiful finishing touches with a graceful feel."
+      }
+    ];
 
     const starterProducts = [
       {
@@ -485,6 +528,122 @@
       loadAdminProducts();
     });
 
+    function categorySlug(name) {
+      return name.toLowerCase().trim().replace(/\s+/g, "-");
+    }
+
+    function categoryLink(name) {
+      return `products.html?category=${encodeURIComponent(name)}`;
+    }
+    
+    function resetCategoryForm() {
+      categoryId.value = "";
+      categoryForm.reset();
+    }
+  
+    function categoryCard(category) {
+      return `
+        <article class="admin-product">
+          <div>
+            <h3>${category.name}</h3>
+            <p>${category.description}</p>
+          </div>
+    
+          <div class="admin-actions">
+            <button class="btn btn-small" onclick="editCategory('${category.docId}')">Edit</button>
+            <button class="btn btn-small danger-btn" onclick="deleteCategory('${category.docId}')">Delete</button>
+          </div>
+        </article>
+      `;
+    }
+    
+    async function loadCategories() {
+      const snapshot = await db.collection("categories").orderBy("name", "asc").get();
+    
+      if (snapshot.empty) {
+        adminCategories.innerHTML = "<p>No categories yet. Click Seed Categories first.</p>";
+        return;
+      }
+    
+      const categories = snapshot.docs.map(doc => ({
+        docId: doc.id,
+        ...doc.data()
+      }));
+    
+      adminCategories.innerHTML = categories.map(categoryCard).join("");
+    
+      productCategory.innerHTML = `
+        <option value="">Select category</option>
+        ${categories.map(category => `<option value="${category.name}">${category.name}</option>`).join("")}
+      `;
+    }
+    
+    window.editCategory = async function(docId) {
+      const doc = await db.collection("categories").doc(docId).get();
+      if (!doc.exists) return;
+    
+      const category = doc.data();
+     
+      categoryId.value = docId;
+      categoryName.value = category.name || "";
+      categoryDescription.value = category.description || "";
+    };
+    
+    window.deleteCategory = async function(docId) {
+      const confirmed = confirm("Delete this category?");
+      if (!confirmed) return;
+    
+      await db.collection("categories").doc(docId).delete();
+      showToast("Category deleted");
+      loadCategories();
+    };
+    
+    categoryForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+    
+      const name = categoryName.value.trim();
+    
+      const categoryData = {
+        name,
+        slug: categorySlug(name),
+        description: categoryDescription.value.trim(),
+        link: categoryLink(name),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+    
+      if (categoryId.value) {
+        await db.collection("categories").doc(categoryId.value).set(categoryData, { merge: true });
+        showToast("Category updated");
+      } else {
+        categoryData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+        await db.collection("categories").doc(categorySlug(name)).set(categoryData);
+        showToast("Category added");
+      }
+    
+      resetCategoryForm();
+      loadCategories();
+    });
+    
+    resetCategoryBtn.addEventListener("click", resetCategoryForm);
+    
+    seedCategoriesBtn.addEventListener("click", async () => {
+      const confirmed = confirm("Seed starter categories?");
+      if (!confirmed) return;
+    
+      for (const category of starterCategories) {
+        await db.collection("categories").doc(categorySlug(category.name)).set({
+          ...category,
+          slug: categorySlug(category.name),
+          link: categoryLink(category.name),
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }
+    
+      showToast("Categories seeded");
+      loadCategories();
+    });
+    
     auth.onAuthStateChanged(async (user) => {
       if (!user) {
         window.location.href = "login.html";
@@ -504,6 +663,7 @@
         return;
       }
 
+      await loadCategories();
       await loadAdminProducts();
       await loadOrders();
     });
