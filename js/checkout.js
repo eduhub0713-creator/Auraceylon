@@ -1,6 +1,8 @@
 const CHECKOUT_CART_KEY = "auraceylon-cart";
 const CHECKOUT_DELIVERY_FEE = 0;
 
+let checkoutUser = null;
+
 function getCheckoutCart() {
   const cart = localStorage.getItem(CHECKOUT_CART_KEY);
   return cart ? JSON.parse(cart) : [];
@@ -8,6 +10,30 @@ function getCheckoutCart() {
 
 function saveCheckoutCart(cart) {
   localStorage.setItem(CHECKOUT_CART_KEY, JSON.stringify(cart));
+}
+
+async function loadCheckoutCartFromFirestore(user) {
+  const doc = await db.collection("users").doc(user.uid).get();
+
+  if (doc.exists && Array.isArray(doc.data().cart)) {
+    saveCheckoutCart(doc.data().cart);
+  } else {
+    saveCheckoutCart([]);
+  }
+}
+
+async function clearUserCart(user) {
+  if (!user) return;
+
+  await db.collection("users").doc(user.uid).set(
+    {
+      cart: [],
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    },
+    { merge: true }
+  );
+
+  localStorage.removeItem(CHECKOUT_CART_KEY);
 }
 
 function formatCheckoutPrice(price) {
@@ -87,16 +113,6 @@ function updateCheckoutSummary(cart) {
   if (summaryTotal) summaryTotal.textContent = formatCheckoutPrice(total);
 }
 
-function validateCartBeforeCheckout(cart) {
-  if (cart.length === 0) {
-    alert("Your cart is empty. Please add products before checkout.");
-    window.location.href = "products.html";
-    return false;
-  }
-
-  return true;
-}
-
 function getFormData(form) {
   const formData = new FormData(form);
 
@@ -113,38 +129,42 @@ function getFormData(form) {
 
 function validateCheckoutForm(data) {
   if (!data.fullName) {
-    alert("Please enter your full name.");
+    showToast("Please enter your full name.");
     return false;
   }
 
   if (!data.phoneNumber) {
-    alert("Please enter your phone number.");
+    showToast("Please enter your phone number.");
     return false;
   }
 
   if (!data.addressLine) {
-    alert("Please enter your delivery address.");
+    showToast("Please enter your delivery address.");
     return false;
   }
 
   if (!data.city) {
-    alert("Please enter your city.");
+    showToast("Please enter your city.");
     return false;
   }
 
   if (!data.paymentMethod) {
-    alert("Please select a payment method.");
+    showToast("Please select a payment method.");
     return false;
   }
 
   return true;
 }
 
-function saveOrder(order) {
-  const existingOrders = localStorage.getItem("auraceylon-orders");
-  const orders = existingOrders ? JSON.parse(existingOrders) : [];
-  orders.push(order);
-  localStorage.setItem("auraceylon-orders", JSON.stringify(orders));
+async function saveOrderToFirestore(order) {
+  await db.collection("orders").doc(order.id).set(order);
+
+  await db
+    .collection("users")
+    .doc(checkoutUser.uid)
+    .collection("orders")
+    .doc(order.id)
+    .set(order);
 }
 
 function showCheckoutSuccess() {
@@ -159,21 +179,37 @@ function handleCheckoutSubmit() {
   const form = document.getElementById("checkoutForm");
   if (!form) return;
 
-  form.addEventListener("submit", (event) => {
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
+    if (!checkoutUser) {
+      showToast("Please login before checkout.");
+      window.location.href = "login.html";
+      return;
+    }
+
     const cart = getCheckoutCart();
-    if (!validateCartBeforeCheckout(cart)) return;
+
+    if (cart.length === 0) {
+      showToast("Your cart is empty.");
+      window.location.href = "products.html";
+      return;
+    }
 
     const customer = getFormData(form);
+
     if (!validateCheckoutForm(customer)) return;
 
     const subtotal = calculateCheckoutSubtotal(cart);
     const total = subtotal + CHECKOUT_DELIVERY_FEE;
 
+    const orderId = `AC-${Date.now()}`;
+
     const order = {
-      id: `AC-${Date.now()}`,
-      createdAt: new Date().toISOString(),
+      id: orderId,
+      userId: checkoutUser.uid,
+      userEmail: checkoutUser.email,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       customer,
       items: cart,
       summary: {
@@ -185,25 +221,50 @@ function handleCheckoutSubmit() {
       status: "new"
     };
 
-    saveOrder(order);
-    localStorage.removeItem(CHECKOUT_CART_KEY);
-    updateCheckoutCartCount();
-    showCheckoutSuccess();
+    try {
+      showToast("Placing order...");
 
-    console.log("Order saved:", order);
+      await saveOrderToFirestore(order);
+      await clearUserCart(checkoutUser);
+
+      updateCheckoutCartCount();
+      renderCheckoutItems([]);
+      updateCheckoutSummary([]);
+      showCheckoutSuccess();
+
+      showToast("Order placed successfully.");
+    } catch (error) {
+      console.error(error);
+      showToast("Failed to place order.");
+    }
   });
 }
 
 function initCheckoutPage() {
-  const cart = getCheckoutCart();
+  auth.onAuthStateChanged(async (user) => {
+    if (!user) {
+      showToast("Please login to checkout.");
+      window.location.href = "login.html";
+      return;
+    }
 
-  updateCheckoutCartCount();
+    checkoutUser = user;
 
-  if (!validateCartBeforeCheckout(cart)) return;
+    await loadCheckoutCartFromFirestore(user);
 
-  renderCheckoutItems(cart);
-  updateCheckoutSummary(cart);
-  handleCheckoutSubmit();
+    const cart = getCheckoutCart();
+
+    if (cart.length === 0) {
+      showToast("Your cart is empty.");
+      window.location.href = "products.html";
+      return;
+    }
+
+    updateCheckoutCartCount();
+    renderCheckoutItems(cart);
+    updateCheckoutSummary(cart);
+    handleCheckoutSubmit();
+  });
 }
 
 document.addEventListener("DOMContentLoaded", initCheckoutPage);
