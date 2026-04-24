@@ -405,6 +405,8 @@
         setProfileMessage(error.message);
       }
     });
+
+    protectPage({ requireAuth: true });
   </script>
 </body>
 </html>
