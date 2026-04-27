@@ -1,56 +1,77 @@
 let deferredPrompt = null;
 
-window.addEventListener("DOMContentLoaded", () => {
+function showInstallButton() {
+  const installBtn = document.getElementById("installBtn");
+
+  if (installBtn && deferredPrompt) {
+    installBtn.style.display = "inline-flex";
+  }
+}
+
+function hideInstallButton() {
   const installBtn = document.getElementById("installBtn");
 
   if (installBtn) {
     installBtn.style.display = "none";
   }
+}
+
+function isAppInstalled() {
+  return window.matchMedia("(display-mode: standalone)").matches ||
+    window.navigator.standalone === true;
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  hideInstallButton();
 
   if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker
-        .register("service-worker.js")
-        .then((registration) => {
-          console.log("Service Worker registered:", registration.scope);
-        })
-        .catch((error) => {
-          console.log("Service Worker registration failed:", error);
-        });
+    window.addEventListener("load", async () => {
+      try {
+        const registration = await navigator.serviceWorker.register("/service-worker.js");
+        console.log("Service Worker registered:", registration.scope);
+      } catch (error) {
+        console.log("Service Worker registration failed:", error);
+      }
     });
+  }
+
+  if (isAppInstalled()) {
+    hideInstallButton();
   }
 
   window.addEventListener("beforeinstallprompt", (event) => {
     event.preventDefault();
     deferredPrompt = event;
-
-    if (installBtn) {
-      installBtn.style.display = "inline-flex";
-    }
+    showInstallButton();
   });
+
+  const installBtn = document.getElementById("installBtn");
 
   if (installBtn) {
     installBtn.addEventListener("click", async () => {
-      if (!deferredPrompt) return;
+      if (!deferredPrompt) {
+        showToast("Install option will appear when your browser allows it.");
+        return;
+      }
 
       deferredPrompt.prompt();
+
       const choiceResult = await deferredPrompt.userChoice;
 
       if (choiceResult.outcome === "accepted") {
-        console.log("User installed the app");
+        showToast("Aura Ceylon app installed.");
       } else {
-        console.log("User dismissed the install prompt");
+        showToast("Install cancelled.");
       }
 
       deferredPrompt = null;
-      installBtn.style.display = "none";
+      hideInstallButton();
     });
   }
 
   window.addEventListener("appinstalled", () => {
-    console.log("App installed");
-    if (installBtn) {
-      installBtn.style.display = "none";
-    }
+    deferredPrompt = null;
+    hideInstallButton();
+    showToast("Aura Ceylon installed successfully.");
   });
 });
