@@ -252,3 +252,63 @@
     min-height: 320px;
   }
 }
+
+/* ===== PRICE STYLE (OLD + NEW) ===== */
+
+.product-price {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.old-price {
+  text-decoration: line-through;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.new-price {
+  color: var(--gold-soft);
+  font-weight: 700;
+  font-size: 16px;
+}
+
+/* ===== STOCK BADGE ===== */
+
+.stock-badge {
+  margin-top: 6px;
+  display: inline-block;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  width: fit-content;
+}
+
+/* In stock */
+.stock-badge.in {
+  color: #7dffb2;
+  border-color: rgba(125, 255, 178, 0.5);
+}
+
+/* Low stock */
+.stock-badge.low {
+  color: #ffd166;
+  border-color: rgba(255, 209, 102, 0.5);
+}
+
+/* Out of stock */
+.stock-badge.out {
+  color: #ff6b6b;
+  border-color: rgba(255, 107, 107, 0.5);
+}
+
+/* ===== DISABLE BUTTON STYLE ===== */
+
+.btn-disabled {
+  pointer-events: none;
+  opacity: 0.5;
+  border-color: var(--border);
+  color: var(--text-soft);
+}
