@@ -1,31 +1,65 @@
-const PRODUCTS_STORAGE_KEY = "auraceylon-cart";
-
 let allProducts = [];
 let activeCategory = "All";
 let activeSearch = "";
 let activeSort = "default";
 
 function formatLKR(price) {
-  return `LKR ${Number(price).toLocaleString()}`;
+  return `LKR ${Number(price || 0).toLocaleString()}`;
 }
 
 function getCartItems() {
-  const savedCart = localStorage.getItem(PRODUCTS_STORAGE_KEY);
-  return savedCart ? JSON.parse(savedCart) : [];
+  return getUICart();
 }
 
 function updateCartBadge() {
-  const cartCountEl = document.getElementById("cartCount");
-  if (!cartCountEl) return;
-
-  const cart = getCartItems();
-  const total = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-  cartCountEl.textContent = total;
+  updateGlobalCartCount();
 }
 
 function getCategoryFromURL() {
   const params = new URLSearchParams(window.location.search);
   return params.get("category");
+}
+
+function getStatusLabel(product) {
+  const stock = Number(product.stock || 0);
+
+  if (product.status === "out-of-stock" || stock <= 0) {
+    return "Out of Stock";
+  }
+
+  if (product.status === "low-stock" || stock <= 3) {
+    return "Low Stock";
+  }
+
+  return "In Stock";
+}
+
+function getStatusClass(product) {
+  const statusLabel = getStatusLabel(product);
+
+  if (statusLabel === "Out of Stock") return "stock-badge out";
+  if (statusLabel === "Low Stock") return "stock-badge low";
+  return "stock-badge in";
+}
+
+function createPriceHTML(product) {
+  const originalPrice = Number(product.originalPrice || 0);
+  const sellingPrice = Number(product.price || 0);
+
+  if (originalPrice > sellingPrice) {
+    return `
+      <p class="product-price">
+        <span class="old-price">${formatLKR(originalPrice)}</span>
+        <span class="new-price">${formatLKR(sellingPrice)}</span>
+      </p>
+    `;
+  }
+
+  return `
+    <p class="product-price">
+      <span class="new-price">${formatLKR(sellingPrice)}</span>
+    </p>
+  `;
 }
 
 function createProductCard(product) {
@@ -38,10 +72,15 @@ function createProductCard(product) {
       <div class="product-image-wrap">
         ${imageMarkup}
       </div>
+
       <div class="product-info">
         <p class="product-category">${product.category}</p>
         <h3>${product.name}</h3>
-        <p class="product-price">${formatLKR(product.price)}</p>
+
+        ${createPriceHTML(product)}
+
+        <p class="${getStatusClass(product)}">${getStatusLabel(product)}</p>
+
         <a href="product-details.html?id=${product.id}" class="btn btn-small">View Product</a>
       </div>
     </article>
@@ -174,6 +213,26 @@ async function loadProductsData() {
   }
 }
 
+async function loadCategoryFilters() {
+  const categoryFilters = document.getElementById("categoryFilters");
+  if (!categoryFilters) return;
+
+  try {
+    const snapshot = await db.collection("categories").orderBy("name", "asc").get();
+
+    let html = `<button class="filter-btn active" data-category="All">All</button>`;
+
+    snapshot.forEach((doc) => {
+      const category = doc.data();
+      html += `<button class="filter-btn" data-category="${category.name}">${category.name}</button>`;
+    });
+
+    categoryFilters.innerHTML = html;
+  } catch (error) {
+    console.error("Failed to load category filters:", error);
+  }
+}
+
 async function initProductsPage() {
   updateCartBadge();
 
@@ -201,26 +260,6 @@ async function initProductsPage() {
   attachSearchEvent();
   attachSortEvent();
   renderProducts();
-}
-
-async function loadCategoryFilters() {
-  const categoryFilters = document.getElementById("categoryFilters");
-  if (!categoryFilters) return;
-
-  try {
-    const snapshot = await db.collection("categories").orderBy("name", "asc").get();
-
-    let html = `<button class="filter-btn active" data-category="All">All</button>`;
-
-    snapshot.forEach((doc) => {
-      const category = doc.data();
-      html += `<button class="filter-btn" data-category="${category.name}">${category.name}</button>`;
-    });
-
-    categoryFilters.innerHTML = html;
-  } catch (error) {
-    console.error("Failed to load category filters:", error);
-  }
 }
 
 document.addEventListener("DOMContentLoaded", initProductsPage);
