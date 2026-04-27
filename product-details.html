@@ -195,7 +195,49 @@
     }
 
     function formatPrice(price) {
-      return `LKR ${Number(price).toLocaleString()}`;
+      return `LKR ${Number(price || 0).toLocaleString()}`;
+    }
+
+    function getStatusLabel(product) {
+      const stock = Number(product.stock || 0);
+
+      if (product.status === "out-of-stock" || stock <= 0) {
+        return "Out of Stock";
+      }
+
+      if (product.status === "low-stock" || stock <= 3) {
+        return "Low Stock";
+      }
+
+      return "In Stock";
+    }
+
+    function getStatusClass(product) {
+      const label = getStatusLabel(product);
+
+      if (label === "Out of Stock") return "stock-badge out";
+      if (label === "Low Stock") return "stock-badge low";
+      return "stock-badge in";
+    }
+
+    function createPriceHTML(product) {
+      const originalPrice = Number(product.originalPrice || 0);
+      const sellingPrice = Number(product.price || 0);
+
+      if (originalPrice > sellingPrice) {
+        return `
+          <p class="product-price">
+            <span class="old-price">${formatPrice(originalPrice)}</span>
+            <span class="new-price">${formatPrice(sellingPrice)}</span>
+          </p>
+        `;
+      }
+
+      return `
+        <p class="product-price">
+          <span class="new-price">${formatPrice(sellingPrice)}</span>
+        </p>
+      `;
     }
 
     async function saveCartToFirestore(cart) {
@@ -214,6 +256,17 @@
 
     async function addToCart(product, quantity) {
       const user = auth.currentUser;
+      const stock = Number(product.stock || 0);
+
+      if (product.status === "out-of-stock" || stock <= 0) {
+        showToast("This product is out of stock.");
+        return;
+      }
+
+      if (quantity > stock) {
+        showToast(`Only ${stock} item${stock === 1 ? "" : "s"} available.`);
+        return;
+      }
 
       if (!user) {
         localStorage.setItem("redirectAfterLogin", window.location.href);
@@ -224,19 +277,27 @@
         }, 700);
 
         return;
-      }    
-  
+      }
+
       const cart = getCartItems();
       const existingItem = cart.find(item => Number(item.id) === Number(product.id));
 
       if (existingItem) {
-        existingItem.quantity += quantity;
+        const nextQuantity = Number(existingItem.quantity || 1) + quantity;
+
+        if (nextQuantity > stock) {
+          showToast(`Only ${stock} item${stock === 1 ? "" : "s"} available.`);
+          return;
+        }
+
+        existingItem.quantity = nextQuantity;
       } else {
         cart.push({
           id: product.id,
           name: product.name,
           category: product.category,
           price: product.price,
+          originalPrice: product.originalPrice || 0,
           image: product.image,
           quantity: quantity
         });
@@ -253,6 +314,10 @@
       const container = document.getElementById("productDetailsContainer");
       if (!container) return;
 
+      const statusLabel = getStatusLabel(product);
+      const isOutOfStock = statusLabel === "Out of Stock";
+      const maxStock = Number(product.stock || 0);
+
       container.innerHTML = `
         <div class="product-details-image-box">
           <div class="product-details-image-wrap">
@@ -267,16 +332,33 @@
         <div class="product-details-info">
           <p class="product-category">${product.category}</p>
           <h2>${product.name}</h2>
-          <p class="product-price">${formatPrice(product.price)}</p>
+  
+          ${createPriceHTML(product)}
+
+          <p class="${getStatusClass(product)}">${statusLabel}</p>
           <p class="product-description">${product.description || "No description available."}</p>
 
           <div class="product-details-actions">
             <div class="quantity-box">
               <label for="quantityInput">Qty</label>
-              <input type="number" id="quantityInput" min="1" value="1" />
+              <input
+                type="number"
+                id="quantityInput"
+                min="1"
+                max="${maxStock}"
+                value="1"
+                ${isOutOfStock ? "disabled" : ""}
+              />
             </div>
 
-            <button class="btn btn-gold" id="addToCartBtn">Add to Cart</button>
+            <button
+              class="btn btn-gold ${isOutOfStock ? "btn-disabled" : ""}"
+              id="addToCartBtn"
+              ${isOutOfStock ? "disabled" : ""}
+            >
+              ${isOutOfStock ? "Out of Stock" : "Add to Cart"}
+            </button>
+
             <a href="products.html" class="btn btn-outline">Back to Shop</a>
           </div>
         </div>
@@ -285,7 +367,7 @@
       const addToCartBtn = document.getElementById("addToCartBtn");
       const quantityInput = document.getElementById("quantityInput");
 
-      if (addToCartBtn && quantityInput) {
+      if (addToCartBtn && quantityInput && !isOutOfStock) {
         addToCartBtn.addEventListener("click", async () => {
           const quantity = Math.max(1, Number(quantityInput.value) || 1);
           await addToCart(product, quantity);
@@ -317,7 +399,6 @@
         }
 
         renderProduct(product);
-
       } catch (error) {
         console.error("Failed to load product:", error);
         if (detailsBox) detailsBox.hidden = true;
