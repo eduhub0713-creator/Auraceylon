@@ -46,6 +46,9 @@
         <a href="about.html">About</a>
         <a href="contact.html">Contact</a>
         <a href="cart.html" class="cart-link active">Cart <span id="cartCount">0</span></a>
+        <span id="userArea">
+          <a href="login.html" id="loginBtn">Login</a>
+        </span>
       </nav>
     </div>
   </header>
@@ -174,15 +177,6 @@
   <script src="js/cart.js"></script>
 
   <script>
-    const menuToggle = document.getElementById("menuToggle");
-    const navLinks = document.getElementById("navLinks");
-
-    if (menuToggle && navLinks) {
-      menuToggle.addEventListener("click", () => {
-        navLinks.classList.toggle("show");
-      });
-    }
-
     protectPage({ requireAuth: true });
   </script>
 </body>
