@@ -81,12 +81,43 @@ async function loadCartFromFirestore(user) {
   if (!user) return;
 
   try {
-    const doc = await db.collection("users").doc(user.uid).get();
+    const docRef = db.collection("users").doc(user.uid);
+    const doc = await docRef.get();
+
+    const localCart = getUICart(); // guest or previous cart
+
+    let firestoreCart = [];
 
     if (doc.exists && Array.isArray(doc.data().cart)) {
-      saveUICart(doc.data().cart);
-      updateGlobalCartCount();
+      firestoreCart = doc.data().cart;
     }
+
+    // 🔥 MERGE LOGIC (IMPORTANT)
+    const mergedCart = [...firestoreCart];
+
+    localCart.forEach(localItem => {
+      const existing = mergedCart.find(item => Number(item.id) === Number(localItem.id));
+
+      if (existing) {
+        existing.quantity += localItem.quantity;
+      } else {
+        mergedCart.push(localItem);
+      }
+    });
+
+    // SAVE MERGED CART
+    saveUICart(mergedCart);
+
+    await docRef.set(
+      {
+        cart: mergedCart,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      },
+      { merge: true }
+    );
+
+    updateGlobalCartCount();
+
   } catch (err) {
     console.error("Load cart failed:", err);
   }
