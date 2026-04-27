@@ -1,9 +1,14 @@
-const UI_CART_KEY = "auraceylon-cart";
+function getCartKey(user) {
+  return user ? `auraceylon-cart-${user.uid}` : "auraceylon-cart-guest";
+}
 
 // ===== CART LOCAL =====
 function getUICart() {
   try {
-    const cart = localStorage.getItem(UI_CART_KEY);
+    const user = firebase.auth().currentUser;
+    const cartKey = getCartKey(user);
+
+    const cart = localStorage.getItem(cartKey);
     return cart ? JSON.parse(cart) : [];
   } catch (error) {
     console.error("Failed to read cart:", error);
@@ -12,7 +17,9 @@ function getUICart() {
 }
 
 function saveUICart(cart) {
-  localStorage.setItem(UI_CART_KEY, JSON.stringify(cart));
+  const user = firebase.auth().currentUser;
+  const cartKey = getCartKey(user);
+  localStorage.setItem(cartKey, JSON.stringify(cart));
 }
 
 function getUICartCount() {
