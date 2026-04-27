@@ -1,15 +1,13 @@
-const CHECKOUT_CART_KEY = "auraceylon-cart";
 const CHECKOUT_DELIVERY_FEE = 0;
 
 let checkoutUser = null;
 
 function getCheckoutCart() {
-  const cart = localStorage.getItem(CHECKOUT_CART_KEY);
-  return cart ? JSON.parse(cart) : [];
+  return getUICart();
 }
 
 function saveCheckoutCart(cart) {
-  localStorage.setItem(CHECKOUT_CART_KEY, JSON.stringify(cart));
+  saveUICart(cart);
 }
 
 async function loadCheckoutCartFromFirestore(user) {
@@ -33,7 +31,7 @@ async function clearUserCart(user) {
     { merge: true }
   );
 
-  localStorage.removeItem(CHECKOUT_CART_KEY);
+  saveUICart([]);
 }
 
 function formatCheckoutPrice(price) {
