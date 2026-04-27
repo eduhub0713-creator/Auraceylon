@@ -162,6 +162,47 @@
       border: 1px solid var(--border);
     }
 
+    .analytics-card {
+      grid-column: 1 / -1;
+    }
+
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 14px;
+    }
+
+    .analytics-box {
+      padding: 16px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+    }
+
+    .analytics-box span {
+      display: block;
+      color: var(--text-soft);
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .analytics-box strong {
+      color: var(--gold-soft);
+      font-size: 20px;
+    }
+
+    @media (max-width: 900px) {
+      .analytics-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 520px) {
+      .analytics-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
     @media (max-width: 900px) {
       .admin-grid {
         grid-template-columns: 1fr;
@@ -214,6 +255,42 @@
       </div>
 
       <div class="admin-grid">
+        <section class="admin-card analytics-card">
+          <h2>Analytics</h2>
+
+          <div class="analytics-grid">
+            <div class="analytics-box">
+              <span>Total Orders</span>
+              <strong id="totalOrders">0</strong>
+            </div>
+
+            <div class="analytics-box">
+              <span>Total Revenue</span>
+              <strong id="totalRevenue">LKR 0</strong>
+            </div>
+
+            <div class="analytics-box">
+              <span>Pending Orders</span>
+              <strong id="pendingOrders">0</strong>
+            </div>
+
+            <div class="analytics-box">
+              <span>Delivered</span>
+              <strong id="deliveredOrders">0</strong>
+            </div>
+
+            <div class="analytics-box">
+              <span>Products</span>
+              <strong id="totalProducts">0</strong>
+            </div>
+
+            <div class="analytics-box">
+              <span>Low / Out Stock</span>
+              <strong id="stockAlerts">0</strong>
+            </div>
+          </div>
+        </section>
+        
         <section class="admin-card">
           <h2 id="formTitle">Add Product</h2>
 
@@ -332,6 +409,13 @@
     const seedCategoriesBtn = document.getElementById("seedCategoriesBtn");
 
     const adminOrders = document.getElementById("adminOrders");
+
+    const totalOrders = document.getElementById("totalOrders");
+    const totalRevenue = document.getElementById("totalRevenue");
+    const pendingOrders = document.getElementById("pendingOrders");
+    const deliveredOrders = document.getElementById("deliveredOrders");
+    const totalProducts = document.getElementById("totalProducts");
+    const stockAlerts = document.getElementById("stockAlerts");
 
     const starterCategories = [
       {
@@ -826,6 +910,37 @@
       loadOrders();
     };
 
+    async function loadAnalytics() {
+      const ordersSnapshot = await db.collection("orders").get();
+      const productsSnapshot = await db.collection("products").get();
+
+      const orders = ordersSnapshot.docs.map(doc => doc.data());
+      const products = productsSnapshot.docs.map(doc => doc.data());
+
+      const revenue = orders
+        .filter(order => order.status !== "cancelled")
+        .reduce((sum, order) => sum + Number(order.summary?.total || 0), 0);
+
+      const pending = orders.filter(order => {
+        return ["new", "processing", "packed", "shipped"].includes(order.status || "new");
+      }).length;
+
+      const delivered = orders.filter(order => order.status === "delivered").length;
+
+      const stockAlertCount = products.filter(product => {
+        return product.status === "low-stock" ||
+          product.status === "out-of-stock" ||
+          Number(product.stock || 0) <= 3;
+      }).length;
+
+      totalOrders.textContent = orders.length;
+      totalRevenue.textContent = formatPrice(revenue);
+      pendingOrders.textContent = pending;
+      deliveredOrders.textContent = delivered;
+      totalProducts.textContent = products.length;
+      stockAlerts.textContent = stockAlertCount;
+    }
+
     auth.onAuthStateChanged(async (user) => {
       if (!user) {
         window.location.href = "login.html";
@@ -848,6 +963,7 @@
       await loadCategories();
       await loadAdminProducts();
       await loadOrders();
+      await loadAnalytics();
     });
   </script>
 </body>
