@@ -279,6 +279,23 @@
       togglePasswordVisibility(confirmPasswordInput, toggleConfirmPassword);
     });
 
+    // LIVE PASSWORD MATCH CHECK
+    confirmPasswordInput.addEventListener("input", () => {
+      const password = passwordInput.value;
+      const confirmPassword = confirmPasswordInput.value;
+
+      if (!confirmPassword) {
+        authMessage.textContent = "";
+        return;
+      }
+
+      if (password.startsWith(confirmPassword)) {
+        authMessage.textContent = "";
+      } else {
+        authMessage.textContent = "Passwords do not match.";
+      }
+    });
+
     async function createUserProfile(user, fullName) {
       await db.collection("users").doc(user.uid).set(
         {
