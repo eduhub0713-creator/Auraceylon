@@ -161,7 +161,9 @@
   <script src="js/ui.js"></script>
 
   <script>
-    const CART_KEY = "auraceylon-cart";
+    function getCartKey(user) {
+      return user ? `auraceylon-cart-${user.uid}` : "auraceylon-cart-guest";
+    }
 
     function getProductIdFromURL() {
       const params = new URLSearchParams(window.location.search);
@@ -169,12 +171,18 @@
     }
 
     function getCartItems() {
-      const cart = localStorage.getItem(CART_KEY);
+      const user = auth.currentUser;
+      const cartKey = getCartKey(user);
+
+      const cart = localStorage.getItem(cartKey);
       return cart ? JSON.parse(cart) : [];
     }
 
     function saveCartItems(cart) {
-      localStorage.setItem(CART_KEY, JSON.stringify(cart));
+      const user = auth.currentUser;
+      const cartKey = getCartKey(user);
+
+      localStorage.setItem(cartKey, JSON.stringify(cart));
     }
 
     function updateCartCountOnPage() {
@@ -190,9 +198,36 @@
       return `LKR ${Number(price).toLocaleString()}`;
     }
 
-    function addToCart(product, quantity) {
+    async function saveCartToFirestore(cart) {
+      const user = auth.currentUser;
+
+      if (!user) return;
+
+      await db.collection("users").doc(user.uid).set(
+        {
+          cart,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        },
+        { merge: true }
+      );
+    }
+
+    async function addToCart(product, quantity) {
+      const user = auth.currentUser;
+
+      if (!user) {
+        localStorage.setItem("redirectAfterLogin", window.location.href);
+        showToast("Please login to add items to cart.");
+
+        setTimeout(() => {
+          window.location.href = "login.html";
+        }, 700);
+
+        return;
+      }    
+  
       const cart = getCartItems();
-      const existingItem = cart.find(item => item.id === product.id);
+      const existingItem = cart.find(item => Number(item.id) === Number(product.id));
 
       if (existingItem) {
         existingItem.quantity += quantity;
@@ -208,6 +243,8 @@
       }
 
       saveCartItems(cart);
+      await saveCartToFirestore(cart);
+
       updateCartCountOnPage();
       showToast(`${product.name} added to cart.`);
     }
@@ -249,9 +286,9 @@
       const quantityInput = document.getElementById("quantityInput");
 
       if (addToCartBtn && quantityInput) {
-        addToCartBtn.addEventListener("click", () => {
+        addToCartBtn.addEventListener("click", async () => {
           const quantity = Math.max(1, Number(quantityInput.value) || 1);
-          addToCart(product, quantity);
+          await addToCart(product, quantity);
         });
       }
     }
