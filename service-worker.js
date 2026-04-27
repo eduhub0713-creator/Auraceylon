@@ -1,48 +1,18 @@
-const CACHE_NAME = "auraceylon-v16";
+const CACHE_NAME = "auraceylon-v17";
 
-const APP_SHELL = [
-  "/",
-  "/index.html",
-  "/products.html",
-  "/product-details.html",
-  "/cart.html",
-  "/checkout.html",
-  "/orders.html",
-  "/profile.html",
-  "/login.html",
-  "/signup.html",
-  "/forgot-password.html",
-  "/about.html",
-  "/contact.html",
+const STATIC_ASSETS = [
   "/offline.html",
   "/manifest.json",
-
-  "/css/base.css",
-  "/css/home.css",
-  "/css/products.css",
-  "/css/cart.css",
-  "/css/responsive.css",
-  "/css/offline.css",
-
-  "/js/firebase.js",
-  "/js/main.js",
-  "/js/products.js",
-  "/js/cart.js",
-  "/js/checkout.js",
-  "/js/ui.js",
-  "/js/pwa.js",
-
   "/assets/logo.jpg",
   "/assets/banner.jpg",
   "/assets/icon-192.png",
-  "/assets/icon-512.png"
+  "/assets/icon-512.png",
+  "/css/offline.css"
 ];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(APP_SHELL);
-    })
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
   );
 
   self.skipWaiting();
@@ -67,30 +37,25 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 
-  const requestUrl = new URL(event.request.url);
+  const url = new URL(event.request.url);
 
-  if (
-    requestUrl.hostname.includes("firebase") ||
-    requestUrl.hostname.includes("googleapis") ||
-    requestUrl.hostname.includes("gstatic")
-  ) {
+  if (url.origin !== self.location.origin) {
     event.respondWith(fetch(event.request));
     return;
   }
 
-  if (event.request.mode === "navigate") {
+  if (
+    event.request.mode === "navigate" ||
+    url.pathname.endsWith(".html") ||
+    url.pathname.endsWith(".js") ||
+    url.pathname.endsWith(".css")
+  ) {
     event.respondWith(
-      fetch(event.request)
-        .then((response) => {
-          const responseClone = response.clone();
-
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseClone);
-          });
-
-          return response;
-        })
-        .catch(() => caches.match("/offline.html"))
+      fetch(event.request, { cache: "no-store" }).catch(() => {
+        if (event.request.mode === "navigate") {
+          return caches.match("/offline.html");
+        }
+      })
     );
 
     return;
@@ -99,10 +64,10 @@ self.addEventListener("fetch", (event) => {
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       return cachedResponse || fetch(event.request).then((networkResponse) => {
-        const responseClone = networkResponse.clone();
+        const clone = networkResponse.clone();
 
         caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseClone);
+          cache.put(event.request, clone);
         });
 
         return networkResponse;
