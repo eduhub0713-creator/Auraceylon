@@ -167,6 +167,36 @@ async function saveOrderToFirestore(order) {
     .set(order);
 }
 
+async function reduceStockAfterOrder(cart) {
+  const batch = db.batch();
+
+  for (const item of cart) {
+    const productRef = db.collection("products").doc(String(item.id));
+    const doc = await productRef.get();
+
+    if (!doc.exists) continue;
+
+    const product = doc.data();
+    const currentStock = Number(product.stock || 0);
+    const newStock = Math.max(0, currentStock - Number(item.quantity || 1));
+
+    let newStatus = "in-stock";
+    if (newStock === 0) {
+      newStatus = "out-of-stock";
+    } else if (newStock <= 3) {
+      newStatus = "low-stock";
+    }
+
+    batch.update(productRef, {
+      stock: newStock,
+      status: newStatus,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }
+
+  await batch.commit();
+}
+
 function showCheckoutSuccess() {
   const form = document.getElementById("checkoutForm");
   const successBox = document.getElementById("checkoutSuccess");
@@ -225,6 +255,7 @@ function handleCheckoutSubmit() {
       showToast("Placing order...");
 
       await saveOrderToFirestore(order);
+      await reduceStockAfterOrder(cart);
       await clearUserCart(checkoutUser);
 
       updateCheckoutCartCount();
