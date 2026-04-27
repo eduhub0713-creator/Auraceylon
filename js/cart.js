@@ -1,15 +1,13 @@
-const CART_STORAGE_KEY = "auraceylon-cart";
 const DELIVERY_FEE = 0;
 
 let currentUser = null;
 
 function getCart() {
-  const cart = localStorage.getItem(CART_STORAGE_KEY);
-  return cart ? JSON.parse(cart) : [];
+  return getUICart();
 }
 
 function saveCart(cart) {
-  localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+  saveUICart(cart);
 }
 
 async function saveUserCart(cart) {
