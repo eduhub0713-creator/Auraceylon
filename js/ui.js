@@ -56,7 +56,9 @@ function updateUserArea(user) {
     const name = getUserDisplayName(user);
 
     userArea.innerHTML = `
-      <span class="nav-user-name">Hi, ${name}</span>
+      <a href="profile.html" class="nav-user-name">Hi, ${name}</a>
+      <a href="profile.html" class="btn btn-small">Profile</a>
+      <a href="orders.html" class="btn btn-small">Orders</a>
       <button id="logoutBtn" class="btn btn-small logout-btn">Logout</button>
     `;
 
