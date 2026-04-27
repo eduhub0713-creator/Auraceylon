@@ -379,7 +379,7 @@
   <script src="js/ui.js"></script>
 
   <script>
-    const ADMIN_EMAILS = ["eduhub0713@gmail.com"];
+    let currentAdminRole = null;
 
     const productForm = document.getElementById("productForm");
     const productDocId = document.getElementById("productDocId");
@@ -541,6 +541,31 @@
 
     function formatPrice(price) {
       return `LKR ${Number(price || 0).toLocaleString()}`;
+    }
+
+    async function getAdminRole(user) {
+      if (!user || !user.email) return null;
+
+      const roleDoc = await db
+        .collection("adminRoles")
+        .doc(user.email)
+        .get();
+
+      if (!roleDoc.exists) return null;
+
+      const roleData = roleDoc.data();
+
+      if (!roleData.active) return null;
+
+      return roleData.role || null;
+    }
+
+    function isSuperAdmin() {
+      return currentAdminRole === "super-admin";
+    }
+
+    function isAdmin() {
+      return currentAdminRole === "admin" || currentAdminRole === "super-admin";
     }
 
     function categorySlug(name) {
@@ -947,7 +972,9 @@
         return;
       }
 
-      if (!ADMIN_EMAILS.includes(user.email)) {
+      currentAdminRole = await getAdminRole(user);
+
+      if (!isAdmin()) {
         document.body.innerHTML = `
           <main class="section">
             <div class="container cta-box">
